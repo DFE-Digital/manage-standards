@@ -1,0 +1,54 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Create" %}
+{% set pageName = "Title of standard" %}
+{% set seoPageName = "" %}
+{% set pageDescription = ""%}
+
+{% set sidenav = 'title' %}
+{% set view = "standard" %}
+
+{% block hero %}
+    {% include './_head.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-width-container ">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter">
+                {% include './_sidenav.html' %}
+            </div>
+            <div class="govuk-grid-column-three-quarters">
+                {% include './errorSummary.html' %}
+
+                <form action="/create/title" method="post">
+                    <div class="govuk-form-group {% if errors %} govuk-form-group--error{% endif %}">
+                        <h2 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--l" for="title">
+                                {{ pageName }}
+                            </label>
+                        </h2>
+                        <div id="title-hint" class="govuk-hint">
+                        This will help people understand what the standard is for
+                    </div>
+                        {% if errors %}
+                            <p id="event-name-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span>
+                                {% for err in errors %}
+                                    {{ err.msg }}
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                        <input class="govuk-input {% if errors %} govuk-input--error{% endif %}" id="title" name="title" type="text" aria-describedby="title-hint" value="{{ standard.title }}">
+                    </div>
+
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Save and continue
+                    </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

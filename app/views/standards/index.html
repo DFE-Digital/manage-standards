@@ -1,0 +1,51 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Dashboard" %}
+{% set pageName = "Standards you own" %}
+
+{% block content %}
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+
+                <h1 class="govuk-heading-l">{{ pageName }}</h1>
+
+                {% if standards | length %}
+
+                    <table class="govuk-table">
+                        <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+                                <th scope="col" class="govuk-table__header">Standard</th>
+                                <th scope="col" class="govuk-table__header">Stage</th>
+                                <th scope="col" class="govuk-table__header">Version</th>
+                                <th scope="col" class="govuk-table__header">Published</th>
+                                <th scope="col" class="govuk-table__header">Last updated</th>
+                            </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            {% for standard in standards %}
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">
+                                        <a href="/standard/{{ standard.slug}}" class="govuk-link">{{ standard.title }}</a>
+                                    </td>
+                                    <td class="govuk-table__cell">{{ standard.stage.title }}</td>
+                                    <td class="govuk-table__cell">{{ standard.version }}</td>
+                                    <td class="govuk-table__cell">{{ standard.firstPublished | date('D MMM YYYY') }}</td>
+                                    <td class="govuk-table__cell">{{ standard.lastUpdated | date('D MMM YYYY') }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                {% else %}
+                    <p class="govuk-body">You do not own any standards. <a href="/create" class="govuk-link">Create a standard</a>
+                    </p>
+                {% endif %}
+
+                {% if canCreate %}{% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

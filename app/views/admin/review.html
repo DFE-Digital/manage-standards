@@ -1,0 +1,52 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Admin" %}
+{% set pageName = "Standards to review" %}
+
+{% block hero %}
+    <div class="dfe-page-header">
+        <div class="govuk-width-container dfe-width-container ">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <span class="govuk-caption-xl govuk-!-padding-top-5">Admin</span>
+                    <h1 class="govuk-heading-xl govuk-!-padding-bottom-4">{{pageName}}</h1>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+             
+                <table class="govuk-table">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th class="govuk-table__header" scope="col">Title</th>
+                            <th class="govuk-table__header" scope="col">Reference</th>
+                            <th class="govuk-table__header" scope="col">Version</th>
+                            <th class="govuk-table__header" scope="col">Submitted</th>
+                            <th class="govuk-table__header" scope="col">Submitted by</th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        {% for standard in standards %}
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell"><a href="/admin/standard/{{standard.slug}}" class="govuk-link">{{standard.title}}</a></td>
+                                <td class="govuk-table__cell">DDTS-{{standard.id}}</td>
+                                <td class="govuk-table__cell">{{standard.version}}</td>
+                                <td class="govuk-table__cell">{{standard.submitted | date('D MMM YYYY')}}</td>
+                                <td class="govuk-table__cell">{{standard.creator.firstName}} {{standard.creator.lastName}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

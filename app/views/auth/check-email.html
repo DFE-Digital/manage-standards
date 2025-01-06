@@ -1,0 +1,16 @@
+{% extends "layouts/publiclayout.html" %}
+
+{% set pageName = "Check your email" %}
+
+{% block content %}
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-l">{{pageName}}</h1>
+                <p class="govuk-body">We've sent you an email with a link.</p>
+                <p class="govuk-body">You need to click on the link in the email within the next 30 minutes to sign in.</p>
+                <p>You can now close this tab.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+ <div class="dfe-page-header dfe-page-header--with-sub-nav">
+        <div class="govuk-width-container dfe-width-container ">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2 govuk-!-margin-top-5">{% if standard.title %}{{standard.title }}{% else%}New standard{% endif %}</h1>
+
+                    <table class="govuk-table  govuk-!-margin-bottom-6">
+                        <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+
+                                <th class="govuk-table__header" scope="col">Stage</th>
+                                <th class="govuk-table__header" scope="col">Reference</th>
+                            </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            <tr class="govuk-table__row">
+
+                                <td class="govuk-table__cell">
+                                    <strong class="govuk-tag govuk-tag--red">Draft</strong>
+                                    <td class="govuk-table__cell">DDTS-{{standard.id}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                  
+                    </div>
+                </div>
+            </div>
+        </div>

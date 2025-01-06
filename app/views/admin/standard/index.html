@@ -1,0 +1,25 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Admin" %}
+{% set pageName = standard.title %}
+{% set sidenav = "standard"%}
+
+
+{% block hero %}
+    {% include './_head.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter">
+                {% include './_sidenav.html' %}
+            </div>
+            <div class="govuk-grid-column-three-quarters">   
+            
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% if cmsEnabled === 'true' %}
+
+{{ header({
+"showNav": "false",
+"showSearch": "false",
+"showHeaderActionLinks": "false",
+"showUserName": "false",
+"userName": "",
+"userNameURL": "",
+"selectedNav": selectedNav,
+"logoPath": "assets/images",
+"searchInputName": "searchterm",
+"logoAltText": serviceName,
+"homeHref":"https://manage-standards.education.gov.uk",
+"service": {
+"name": serviceName,
+"serviceUrl": "/"
+},
+"headerActionLinks": [
+{ "url": "/support", "label": "Support" },
+{ "url": "/guidance", "label": "Guidance" }
+],
+"primaryLinks": [
+{
+    "url": "/",
+    "label": "Home"
+},
+{
+"url" : "/standards",
+"label" : "Standards"
+},
+{
+"url" : "/guidance",
+"label" : "Guidance"
+},
+{
+"url" : "/support",
+"label" : "Support"
+}
+]
+})
+}}
+
+{% else %}
+{{ header({
+"showNav": "true",
+"showSearch": "false",
+"showHeaderActionLinks": "false",
+"showUserName": "false",
+"userName": "",
+"userNameURL": "",
+"selectedNav": selectedNav,
+"logoPath": "assets/images",
+"searchInputName": "searchterm",
+"logoAltText": "Standards manual",
+"homeHref":"https://standards.education.gov.uk",
+"service": {
+"name": "Standards manual",
+"serviceUrl": "/"
+},
+"headerActionLinks": [
+{ "url": "/support", "label": "Support" },
+{ "url": "/guidance", "label": "Guidance" }
+],
+"primaryLinks": [
+{
+    "url": "/",
+    "label": "Home"
+},
+{
+"url" : "/guidance",
+"label" : "Guidance"
+},
+{
+"url" : "/support",
+"label" : "Support"
+}
+]
+})
+}}
+{% endif %}
+
+

@@ -1,0 +1,99 @@
+{% extends "layouts/layout.html" %}
+{% set selectedNav = "Create" %}
+{% set pageName = "Create a standard" %}
+{% set seoPageName = "" %}
+{% set pageDescription = ""%}
+{% set view = "standard" %}
+
+{% block hero %}
+    <div class="dfe-page-header">
+        <div class="govuk-width-container dfe-width-container ">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h1 class="govuk-heading-xl govuk-!-padding-top-5 govuk-!-padding-bottom-4">{{pageName}}</h1>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-width-container ">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <p>Use this service to create a new DDT (Digital Data Technology) standard.</p>
+                <p>You can save and return to your draft standard at a later date if you need to.</p>
+                <p>
+                    <a href="/create/new" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
+  Start now
+  <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                            <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+                        </svg>
+                    </a>
+                </p>
+                {% if drafts | length%}
+                    <div class="govuk-summary-card">
+                        <div class="govuk-summary-card__title-wrapper">
+                            <h2 class="govuk-summary-card__title">
+      Your draft standards
+    </h2>
+                        </div>
+                        <div class="govuk-summary-card__content">
+                            <table class="govuk-table">
+                                <thead class="govuk-table__head">
+                                    <tr class="govuk-table__row">
+                                        <th scope="col" class="govuk-table__header govuk-!-width-one-half">Title</th>
+                                        <th scope="col" class="govuk-table__header">Reference</th>
+                                        <th scope="col" class="govuk-table__header">Started</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="govuk-table__body">
+                                    {% for draft in drafts %}
+
+                                        <tr class="govuk-table__row">
+                                            <th scope="row" class="govuk-table__header">
+                                                <a href="/create/getdraft/{{draft.id}}" class="govuk-link">
+                                                    {% if draft.title %}
+                                                        {{ draft.title }}
+                                                    {% else %}
+    New
+{% endif %}
+                                                </a>
+                                            </th>
+                                            <td class="govuk-table__cell">DDTS-{{draft.id }}</td>
+                                            <td class="govuk-table__cell">{{draft.createdAt | date('DD MMM YYYY')}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+                <p>You can access standards you've created, are the owner, or contact on, from the <a class="govuk-link" href="/dashboard">dashboard</a>.</p>
+                <h2 class="govuk-heading-m">Before you start</h2>
+                <p class="govuk-body">You should:</p>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>speak to relevant <a class="govuk-link" href="https://educationgovuk.sharepoint.com/sites/lvewp00199/SitePages/Head-of-Professions.aspx">Head of Profession</a> about your proposed&nbsp;standard </li>
+                    <li>draft your proposed standard using <a class="govuk-link" href="https://educationgovuk.sharepoint.com/:w:/r/sites/DDTStandards/_layouts/15/Doc.aspx?sourcedoc=%7BA21786C6-BA1F-4591-980D-AFC44376F337%7D&file=DDT%20Standards%20template_%20new_draft.docx&action=default&mobileredirect=true">the standards template</a>
+                    </li>
+                    <li>review your draft standard with the relevant communities</li>
+                    <li>share draft standard with <a href="mailto:Design.Ops@educatiopn.gov.uk" class="govuk-link">DesignOps</a> for content review</li>
+                </ul>
+                <h3 class="govuk-heading-s">If you need help using this service</h3>
+                <p>Contact the <a href="(mailto:">Standards forum</a>.</p>
+            </div>
+            <div class="govuk-grid-column-one-third">
+                <h2 class="govuk-heading-m">Related content</h2>
+                <ul class="govuk-list govuk-list--spaced">
+                    <li>
+                        <a class="govuk-link" target="_blank" rel="noopener noreferrer" href="{{standardsManualURL}}/guidance/definitions">Review definitions for DDT standards <span class="govuk-visually-hidden">(opens in new tab)</span></a>
+                    </li>
+                    <li>
+                        <a class="govuk-link" target="_blank" rel="noopener noreferrer" href="{{standardsManualURL}}/guidance#proposal">Use the draft standards template <span class="govuk-visually-hidden">(opens in new tab)</span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Profile" %}
+{% set pageName = "Your name" %}
+{% set view = "profile" %}
+
+
+
+{% set hasFirstNameError = false %}
+{% for error in errors %}
+    {% if error.path === 'firstName' %}
+        {% set hasFirstNameError = true %}
+    {% endif %}
+{% endfor %}
+
+{% set hasLastNameError = false %}
+{% for error in errors %}
+    {% if error.path === 'lastName' %}
+        {% set hasLastNameError = true %}
+    {% endif %}
+{% endfor %}
+
+{% block content %}
+
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+
+            <div class="govuk-grid-column-three-quarters">
+
+                <h2 class="govuk-heading-l">
+                    {%if user.firstName == null or user.lastName == null%}Add{%else%}Update{%endif%} your name</h2>
+
+                    <form action="/profile/name" method="post" novalidate="novalidate" class="govuk-!-margin-bottom-9">
+
+                        <div
+                class="govuk-form-group {%if hasFirstNameError%}govuk-form-group--error{% endif%}  govuk-!-margin-top-5">
+
+                            <label class="govuk-label" for="firstName">First name</label>
+                            {%if hasFirstNameError %}
+                                <p id="event-name-error" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>Enter your first name
+                </p>
+                            {% endif %}
+                            <input class="govuk-input govuk-!-width-one-half {%if hasFirstNameError%} govuk-input--error{% endif%}"
+                    id="firstName" name="firstName" type="text" spellcheck="false" aria-describedby="firstName-hint"
+                    autocomplete="firstName" value="{{user.firstName}}">
+                        </div>
+
+                        <div
+                class="govuk-form-group {%if hasLastNameError%}govuk-form-group--error{% endif%}  govuk-!-margin-top-5">
+
+                            <label class="govuk-label" for="lastName">Last name</label>
+                            {%if hasLastNameError %}
+                                <p id="event-name-error" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>Enter your last name
+                </p>
+                            {% endif %}
+                            <input class="govuk-input  govuk-!-width-one-half  {%if hasLastNameError%} govuk-input--error{% endif%}"
+                    id="lastName" name="lastName" type="text" spellcheck="false" aria-describedby="lastName-hint"
+                    autocomplete="lastName" value="{{user.lastName}}">
+                        </div>
+
+                        <div class="govuk-button-group">
+                            <button class="govuk-button" data-module="govuk-button">Save</button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

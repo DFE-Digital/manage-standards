@@ -1,0 +1,68 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Dashboard" %}
+{% set pageName = standard.title %}
+{% set view = 'history' %}
+
+{% block hero %}
+    <div class="dfe-page-header dfe-page-header--with-sub-nav">
+        <div class="govuk-width-container dfe-width-container ">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <a href="/standards" class="govuk-back-link">Back</a>
+                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-3 govuk-!-margin-top-0">{{ standard.title }}</h1>
+
+                    <table class="govuk-table  govuk-!-margin-bottom-5">
+                        <thead class="govuk-table__head">
+                            <tr class="govuk-table__row">
+                                <th class="govuk-table__header" scope="col">Reference</th>
+                                <th class="govuk-table__header" scope="col">Version</th>
+                                <th class="govuk-table__header" scope="col">Published</th>
+                                <th class="govuk-table__header" scope="col">Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            <tr class="govuk-table__row">
+                                <td class="govuk-table__cell">STD{{standard.id}}</td>
+                                <td class="govuk-table__cell">{{standard.version}}</td>
+                                <td class="govuk-table__cell">{{standard.firstPublished | date('D MMM YYYY')}}</td>
+                                <td class="govuk-table__cell">{{standard.lastUpdated | date('D MMM YYYY')}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <nav class="app-sub-navigation" aria-label="Application menu">
+                    <ul class="app-sub-navigation__list">
+                        <li class="app-sub-navigation__item">
+                            <a class="app-sub-navigation__link" {% if view==='compliance' %} aria-current="page" {% endif
+                                %} href="/standard/{{standard.slug}}">Compliance</a>
+                        </li>
+                        <li class="app-sub-navigation__item">
+                            <a class="app-sub-navigation__link" {% if view==='manage' %} aria-current="page" {% endif
+                                %}href="/standard/{{standard.slug}}/manage">Manage</a>
+                        </li>
+                        <li class="app-sub-navigation__item">
+                            <a class="app-sub-navigation__link" {% if view==='history' %} aria-current="page" {% endif
+                                %}href="/standard/{{standard.slug}}/history">Change history</a>
+                        </li>
+                    </ul>
+                </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+        
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

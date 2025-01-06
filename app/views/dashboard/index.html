@@ -1,0 +1,79 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Dashboard" %}
+{% set pageName = "Dashboard" %}
+
+{% block hero %}
+    <div class="dfe-page-header">
+        <div class="govuk-width-container dfe-width-container ">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h1 class="govuk-heading-xl govuk-!-padding-top-5 govuk-!-padding-bottom-4">{{pageName}}</h1>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-width-container">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+
+         
+                <div class="dfe-grid-container">
+                    <div class="dfe-card">
+                        <div class="dfe-card-container">
+                            <h3 class="govuk-heading-m">
+                                <a href="/standards" class="govuk-link govuk-link--no-visited-state dfe-card-link--header govuk-!-font-size-80">{{standards | length}}</a>
+                            </h3>
+                            <p>Standards you own</p>
+                        </div>
+                    </div>
+                    <div class="dfe-card">
+                        <div class="dfe-card-container">
+                            <h3 class="govuk-heading-m">
+                                <a href="/products" class="govuk-link govuk-link--no-visited-state dfe-card-link--header govuk-!-font-size-80">7</a>
+                            </h3>
+                            <p>Products you are responsible for</p>
+                        </div>
+                    </div>
+                     <div class="dfe-card">
+                        <div class="dfe-card-container">
+                            <h3 class="govuk-heading-m">
+                                <a href="/admin/review" class="govuk-link govuk-link--no-visited-state dfe-card-link--header govuk-!-font-size-80">{{ standardsReview | length }}</a>
+                            </h3>
+                            <p>Standards requiring review</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+
+            
+
+                <div class="dfe-grid-container">
+                    <div class="dfe-card">
+                        <div class="dfe-card-container">
+                            <h3 class="govuk-heading-m govuk-!-margin-bottom-0">
+                                <a href="/create" class="govuk-link govuk-link--no-visited-state dfe-card-link--header ">Create a standard</a>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="dfe-card">
+                        <div class="dfe-card-container">
+                            <h3 class="govuk-heading-m govuk-!-margin-bottom-0">
+                                <a href="/compliance" class="govuk-link govuk-link--no-visited-state dfe-card-link--header">Report compliance</a>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
