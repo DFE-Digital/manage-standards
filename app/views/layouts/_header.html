@@ -1,81 +1,84 @@
-{% if cmsEnabled === 'true' %}
+  {% if user.Administrator === true %}
 
 {{ header({
-"showNav": "true",
-"showSearch": "false",
-"showHeaderActionLinks": "true",
-"showUserName": "false",
-"userName": "",
-"userNameURL": "",
-"selectedNav": selectedNav,
-"logoPath": "assets/images",
-"searchInputName": "searchterm",
-"logoAltText": serviceName,
-"homeHref":"https://manage-standards.education.gov.uk",
-"service": {
-"name": serviceName,
-"serviceUrl": "/"
-},
-"headerActionLinks": [
-{ "url": "/profile/name", "label": "Profile" }
-],
-"primaryLinks": [
-{
-"url" : "/dashboard",
-"label" : "Dashboard"
-},
-{
-"url" : "/create",
-"label" : "Create"
-},
-{
-"url" : "/compliance",
-"label" : "Compliance"
-},{
-"url" : "/admin",
-"label" : "Admin"
-}
-]
-})
-}}
+  "showNav": "true",
+  "showSearch": "false",
+  "showHeaderActionLinks": "true",
+  "showUserName": "false",
+  "userName": "",
+  "userNameURL": "",
+  "selectedNav": selectedNav,
+  "logoPath": "assets/images",
+  "searchInputName": "searchterm",
+  "logoAltText": serviceName,
+  "homeHref": "https://manage-standards.education.gov.uk",
+  "service": {
+    "name": serviceName,
+    "serviceUrl": "/"
+  },
+  "headerActionLinks": [
+    { "url": "/profile/name", "label": "Profile" },
+    { "url": "/sign-out", "label": "Sign out" }
+  ],
+  "primaryLinks": [
+    {
+      "url": "/dashboard",
+      "label": "Dashboard"
+    },
+    {
+      "url": "/create",
+      "label": "Create"
+    },
+    {
+      "url": "/compliance",
+      "label": "Compliance"
+    },
+    {
+      "url": "/admin",
+      "label": "Admin"
+    }
+  ]
+}) }}
+
+
+
 
 {% else %}
 {{ header({
-"showNav": "true",
-"showSearch": "false",
-"showHeaderActionLinks": "false",
-"showUserName": "false",
-"userName": "",
-"userNameURL": "",
-"selectedNav": selectedNav,
-"logoPath": "assets/images",
-"searchInputName": "searchterm",
-"logoAltText": "Standards manual",
-"homeHref":"https://standards.education.gov.uk",
-"service": {
-"name": "Standards manual",
-"serviceUrl": "/"
-},
-"headerActionLinks": [
-{ "url": "/support", "label": "Support" },
-{ "url": "/guidance", "label": "Guidance" }
-],
-"primaryLinks": [
-{
-    "url": "/",
-    "label": "Home"
-},
-{
-"url" : "/guidance",
-"label" : "Guidance"
-},
-{
-"url" : "/support",
-"label" : "Support"
-}
-]
-})
-}}
+  "showNav": "true",
+  "showSearch": "false",
+  "showHeaderActionLinks": "true",
+  "showUserName": "false",
+  "userName": "",
+  "userNameURL": "",
+  "selectedNav": selectedNav,
+  "logoPath": "assets/images",
+  "searchInputName": "searchterm",
+  "logoAltText": serviceName,
+  "homeHref": "https://manage-standards.education.gov.uk",
+  "service": {
+    "name": serviceName,
+    "serviceUrl": "/"
+  },
+  "headerActionLinks": [
+    { "url": "/profile/name", "label": "Profile" },
+    { "url": "/sign-out", "label": "Sign out" }
+  ],
+  "primaryLinks": [
+    {
+      "url": "/dashboard",
+      "label": "Dashboard"
+    },
+    {
+      "url": "/create",
+      "label": "Create"
+    },
+    {
+      "url": "/compliance",
+      "label": "Compliance"
+    }
+  ]
+}) }}
 {% endif %}
 
 

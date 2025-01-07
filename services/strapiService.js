@@ -58,6 +58,40 @@ const getUser = async (email) => {
         throw new Error(`Error fetching user: ${error.message}`);
     }
 };
+
+
+
+const getAdmins = async () => {
+
+    try {
+        const response = await strapiClient.get(`/api/users`, {
+            params: {
+                'filters[Administrator][$eq]': 1
+            }
+        });
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Ensure data is an array or handle empty results
+        if (!Array.isArray(response.data) || response.data.length === 0) {
+            return null; // Return null if no users match the email
+        }
+
+        return response.data;
+    } catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch admins`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching users: ${error.message}`);
+    }
+};
+
+
+
 const createUser = async (email) => {
     if (!email || typeof email !== 'string') {
         throw new Error("Invalid email: A valid string email must be provided.");
@@ -221,7 +255,7 @@ const getStandardBySlug = async (slug) => {
 };
 
 const getDraftsForApproval = async () => {
- 
+
     try {
         const response = await strapiClient.get(`/api/standards`, {
             params: {
@@ -352,7 +386,7 @@ const updateTitle = async (id, title) => {
             throw new Error("Unexpected response format from Strapi API.");
         }
 
-  
+
 
         return response.data.data;
     } catch (error) {
@@ -501,6 +535,136 @@ const getStandardDraft = async (id, userId) => {
     }
 };
 
+const addAdmin = async (firstName, lastName, email) => {
+
+    try {
+
+        // Check first if user exists, if they do, make them an admin
+
+        const user = await getUser(email);
+
+        if (user) {
+            const payload = {
+                Administrator: 1
+
+            };
+
+            const response = await strapiClient.put(`/api/users/${user.id}`, payload);
+
+            if (!response || !response.data) {
+                throw new Error("Unexpected response format from Strapi API.");
+            }
+
+            return response.data.data;
+        }
+        else {
+
+
+
+            const payload = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                role: 1,
+                Administrator: 1,
+                username: email,
+                password: Math.random().toString(36).substring(2, 12), // Default random password
+                confirmed: true,
+                blocked: false,
+                token: Math.random().toString(36).substring(2, 30)
+
+            };
+
+            const response = await strapiClient.post(`/api/users`, payload);
+
+            if (!response || !response.data) {
+                throw new Error("Unexpected response format from Strapi API.");
+            }
+
+            return response.data.data;
+        }
+    }
+    catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+            // What are the errors
+            if (error.response?.data?.error?.details?.errors) {
+                error.response.data.error.details.errors.forEach(err => {
+                    console.error(`Error: ${err.message}`);
+                });
+            }
+
+            return error.response.data;
+        }
+
+        throw new Error(`Error adding admin: ${error.message}`);
+    }
+}
+
+
+const getUserById = async (id) => {
+
+
+    try {
+        const response = await strapiClient.get(`/api/users`, {
+            params: {
+                'filters[id][$eq]': id
+            }
+        });
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Ensure data is an array or handle empty results
+        if (!Array.isArray(response.data) || response.data.length === 0) {
+            return null; // Return null if no users match the email
+        }
+
+        // Return the user data
+
+        //ToDo: Recycle the token
+
+        return response.data[0]; // Assuming email is unique and returning the first match
+    } catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch user with email: ${email}`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching user: ${error.message}`);
+    }
+};
+
+// set Administrator to 0 for given documentId
+
+const removeAdmin = async (id) => {
+
+    try {
+
+        const payload = {
+            Administrator: 0
+        };
+
+        const response = await strapiClient.put(`/api/users/${id}`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+
+    } catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+            return error.response.data;
+        }
+
+        throw new Error(`Error removing admin: ${error.message}`);
+    }
+}
+
+
 module.exports = {
-    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval
+    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin
 };

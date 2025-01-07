@@ -31,20 +31,22 @@
                             <p>Standards you own</p>
                         </div>
                     </div>
-                    <div class="dfe-card">
-                        <div class="dfe-card-container">
-                            <h3 class="govuk-heading-m">
-                                <a href="/products" class="govuk-link govuk-link--no-visited-state dfe-card-link--header govuk-!-font-size-80">7</a>
-                            </h3>
-                            <p>Products you are responsible for</p>
-                        </div>
-                    </div>
+                    {% if user.Administrator === true %}
                      <div class="dfe-card">
                         <div class="dfe-card-container">
                             <h3 class="govuk-heading-m">
                                 <a href="/admin/review" class="govuk-link govuk-link--no-visited-state dfe-card-link--header govuk-!-font-size-80">{{ standardsReview | length }}</a>
                             </h3>
                             <p>Standards requiring review</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="dfe-card">
+                        <div class="dfe-card-container">
+                            <h3 class="govuk-heading-m">
+                                <a href="/compliance" class="govuk-link govuk-link--no-visited-state dfe-card-link--header">Compliance</a>
+                            </h3>
+                            <p>Find out about reporting compliance against standards.</p>
                         </div>
                     </div>
                 </div>
@@ -64,13 +66,15 @@
                             </h3>
                         </div>
                     </div>
+                       {% if user.Administrator === true %}
                     <div class="dfe-card">
                         <div class="dfe-card-container">
                             <h3 class="govuk-heading-m govuk-!-margin-bottom-0">
-                                <a href="/compliance" class="govuk-link govuk-link--no-visited-state dfe-card-link--header">Report compliance</a>
+                                <a href="/admin" class="govuk-link govuk-link--no-visited-state dfe-card-link--header">Administer standards</a>
                             </h3>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
 
             </div>

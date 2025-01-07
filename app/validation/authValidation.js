@@ -26,3 +26,32 @@ exports.validateSignIn = [
       return true;
     })
 ];
+
+
+// Validate the firstName, lastName and email fields
+exports.validateAddAdmin = [
+  check('firstName')
+    .trim()
+    .custom((value) => {
+      if (value === '') {
+        throw new Error('Enter a first name');
+      }
+      return true;
+    }),
+  check('lastName')
+    .trim()
+    .custom((value) => {
+      if (value === '') {
+        throw new Error('Enter a last name');
+      }
+      return true;
+    }),
+  check('email')
+    .trim()
+    .custom((value) => {
+      if (value === '') {
+        throw new Error('Enter an email address');
+      }
+      return true;
+    })
+];

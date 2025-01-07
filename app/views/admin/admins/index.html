@@ -1,15 +1,14 @@
 {% extends "layouts/layout.html" %}
 
 {% set selectedNav = "Admin" %}
-{% set pageName = "Standards to review" %}
-{% set view = "standards" %}
+{% set pageName = "Administrators"%}
+{% set view = "admins" %}
 
 {% block hero %}
     <div class="dfe-page-header">
         <div class="govuk-width-container dfe-width-container ">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
-                      <a href="/admin" class="govuk-back-link">Back</a>
                     <h1 class="govuk-heading-xl govuk-!-padding-top-5 govuk-!-padding-bottom-0">{{pageName}}</h1>
                     <nav class="app-sub-navigation" aria-label="Application menu">
                         <ul class="app-sub-navigation__list">
@@ -32,30 +31,51 @@
 {% block content %}
     <div class="govuk-width-container">
         <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">
-             
+            <div class="govuk-grid-column-three-quarters">
+
+                <p class="govuk-body">Administrators can perform the following actions:</p>
+
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>add and manage other administrators</li>
+                    <li>review and approve standards</li>
+                    <li>publish and unpublish standards</li>
+                </ul>
+
+<div class="govuk-summary-card">
+  <div class="govuk-summary-card__title-wrapper">
+    <h2 class="govuk-summary-card__title">
+      Active administrators
+    </h2>
+    <ul class="govuk-summary-card__actions">
+      <li class="govuk-summary-card__action">
+        <a class="govuk-link" href="/admin/admins/add">Add administrator</a>
+      </li>
+    </ul>
+  </div>
+  <div class="govuk-summary-card__content">
                 <table class="govuk-table">
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
-                            <th class="govuk-table__header" scope="col">Title</th>
-                            <th class="govuk-table__header" scope="col">Reference</th>
-                            <th class="govuk-table__header" scope="col">Version</th>
-                            <th class="govuk-table__header" scope="col">Submitted</th>
-                            <th class="govuk-table__header" scope="col">Submitted by</th>
+                            <th class="govuk-table__header govuk-!-width-one-third" scope="col">Name</th>
+                            <th class="govuk-table__header" scope="col">Email address</th>
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body">
-                        {% for standard in standards %}
+                        {% for admin in admins %}
                             <tr class="govuk-table__row">
-                                <td class="govuk-table__cell"><a href="/admin/standard/{{standard.slug}}" class="govuk-link">{{standard.title}}</a></td>
-                                <td class="govuk-table__cell">DDTS-{{standard.id}}</td>
-                                <td class="govuk-table__cell">{{standard.version}}</td>
-                                <td class="govuk-table__cell">{{standard.submitted | date('D MMM YYYY')}}</td>
-                                <td class="govuk-table__cell">{{standard.creator.firstName}} {{standard.creator.lastName}}</td>
+                                <td class="govuk-table__cell">
+                                    <a href="/admin/admins/person/{{admin.id}}" class="govuk-link">{{admin.firstName}}
+                                        {{admin.lastName}}</a>
+                                </td>
+                                <td class="govuk-table__cell">{{admin.email}}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                  </div>
+                    </div>
+
+
 
             </div>
         </div>

@@ -1,6 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
+const app = express();
 
 const homeController = require('./controllers/homeController.js');
 const authController = require('./controllers/authController.js');
@@ -10,11 +11,29 @@ const standardsController = require('./controllers/standardsController.js');
 const createController = require('./controllers/createController.js');
 const adminController = require('./controllers/adminController.js');
 
+
+
 function isAuthenticated(req, res, next) {
+    console.log(req.session);
     if (req.session && req.session.User) {
+        res.locals.user = req.session.User;
         return next();
     } else {
         return res.redirect('/sign-in');
+    }
+}
+
+function isAdmin(req, res, next) {
+
+    // This should do a call to Strapi to check if the user is an admin but for now we will just check the session
+
+    // can this be injected into the app.locals?
+
+    if (req.session.User.Administrator == true) {
+
+        return next();
+    } else {
+        return res.redirect('/dashboard');
     }
 }
 
@@ -54,9 +73,13 @@ router.post('/create/purpose', isAuthenticated, createController.p_purpose);
 router.post('/create/how-to-meet', isAuthenticated, createController.p_meet);
 
 // Admin routes
-router.get('/admin', isAuthenticated, adminController.g_admin);
-router.get('/admin/review', isAuthenticated, adminController.g_review);
-router.get('/admin/standard/:slug', isAuthenticated, adminController.g_standard);
+router.get('/admin', isAuthenticated, isAdmin, adminController.g_admin);
+router.get('/admin/review', isAuthenticated, isAdmin, adminController.g_review);
+router.get('/admin/standard/:slug', isAuthenticated, isAdmin, adminController.g_standard);
+router.get('/admin/admins', isAuthenticated, isAdmin, adminController.g_admins);
+router.get('/admin/admins/person/:id', isAuthenticated, isAdmin, adminController.g_person);
 
+router.post('/admin/admins/add', isAuthenticated, isAdmin, adminController.p_add_admin);
+router.post('/admin/admins/remove', isAuthenticated, isAdmin, adminController.p_remove_admin);
 
 module.exports = router; 
