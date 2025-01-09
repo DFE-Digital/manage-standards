@@ -20,14 +20,14 @@
                 {% include './errorSummary.html' %}
 
                 <form action="/create/summary" method="post">
-                    <div class="govuk-form-group govuk-character-count {% if errors %} govuk-form-group--error{% endif %}" data-module="govuk-character-count" data-maxlength="500">
+                    <div class="govuk-form-group govuk-character-count {% if errors %} govuk-form-group--error{% endif %}" data-module="govuk-character-count" data-maxlength="200">
                         <h2 class="govuk-label-wrapper">
                             <label class="govuk-label govuk-label--l" for="summary-hint">
                                 {{ pageName }}
                             </label>
                         </h2>
                         <div id="summary-hint-hint" class="govuk-hint">
-            Add a short description to provide an overview of the standard
+           A short description of the standard. Used in search results and to help people understand the standard at a high level.
           </div>
                         {% if errors %}
                             <p id="event-name-error" class="govuk-error-message">
@@ -37,9 +37,9 @@
                                 {% endfor %}
                             </p>
                         {% endif %}
-                        <textarea class="govuk-textarea govuk-js-character-count {% if errors %} govuk-input--error{% endif %}" id="summary" name="summary" rows="5" aria-describedby="summary-hint-info summary-hint-hint">{{ standard.summary }}</textarea>
+                        <textarea class="govuk-textarea govuk-js-character-count {% if errors %} govuk-input--error{% endif %}" id="summary" name="summary" rows="3" aria-describedby="summary-hint-info summary-hint-hint">{{ standard.summary }}</textarea>
                         <div id="summary-info" class="govuk-hint govuk-character-count__message">
-            You can enter up to 500 characters
+            You can enter up to 200 characters
           </div>
                     </div>
                     <div class="govuk-button-group">

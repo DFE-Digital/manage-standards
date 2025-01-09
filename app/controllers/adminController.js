@@ -8,8 +8,9 @@ exports.g_admin = async (req, res, next) => {
         const user = req.session.User;
 
         const standards = await strapiService.getDraftsForApproval();
+        const countStandards = await strapiService.getCountStandards();
 
-        res.render('admin/index', { standards });
+        res.render('admin/index', { standards, countStandards });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).render('error', {
@@ -37,11 +38,29 @@ exports.g_review = async (req, res, next) => {
     }
 }
 
+exports.g_standards = async (req, res, next) => {
+
+    try {
+        const standards = await strapiService.getStandards();
+        res.render('admin/standards/index', { standards });
+
+    } catch (error) {
+
+        console.error('Error fetching dashboard data:', error);
+        res.status(500).render('error', {
+            title: 'Error',
+            message: 'Failed to load dashboard. Please try again later.'
+        });
+    }
+}
+
 exports.g_standard = async (req, res, next) => {
 
     try {
 
-        const standard = await strapiService.getStandardBySlug(req.params.slug);
+        console.log(req.params.id)
+
+        const standard = await strapiService.getStandardById(req.params.id);
 
         res.render('admin/standard/index', { standard });
     } catch (error) {

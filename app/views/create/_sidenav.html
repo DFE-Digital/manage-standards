@@ -7,7 +7,7 @@
         <li class="dfe-vertical-nav__section-item {% if sidenav === 'title' %}dfe-vertical-nav__section-item--current{% endif %}">
             <a class="dfe-vertical-nav__link" href="/create/title">Title</a>
         </li>
-        {% if standard.id %}
+        {% if standard.standardId %}
         <li class="dfe-vertical-nav__section-item  {% if sidenav === 'summary' %}dfe-vertical-nav__section-item--current{% endif %}">
             <a class="dfe-vertical-nav__link" href="/create/summary">Summary</a>
         </li>
@@ -37,6 +37,9 @@
         </li>
         <li class="dfe-vertical-nav__section-item  {% if sidenav === 'governance' %}dfe-vertical-nav__section-item--current{% endif %}">
             <a class="dfe-vertical-nav__link" href="/create/governance">Governance</a>
+        </li>
+        <li class="dfe-vertical-nav__section-item  {% if sidenav === 'legality' %}dfe-vertical-nav__section-item--current{% endif %}">
+            <a class="dfe-vertical-nav__link" href="/create/legality">Legality</a>
         </li>
         {% endif %}
     </ul>

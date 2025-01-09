@@ -138,6 +138,36 @@ exports.g_meet = async (req, res, next) => {
     }
 };
 
+exports.g_governance = async (req, res, next) => {
+    try {
+        if (!req.session.Standard) {
+            return res.redirect('/create');
+        }
+
+
+        const standard = req.session.Standard
+        return res.render('create/governance', { standard });
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        renderErrorPage(res);
+    }
+};
+
+exports.g_legality = async (req, res, next) => {
+    try {
+        if (!req.session.Standard) {
+            return res.redirect('/create');
+        }
+
+
+        const standard = req.session.Standard
+        return res.render('create/legality', { standard });
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        renderErrorPage(res);
+    }
+};
+
 // POST: Title
 exports.p_title = [
     validation.validateTitle,
@@ -270,6 +300,73 @@ exports.p_meet = [
         } catch (error) {
             console.error('Error updating how-to-meet:', error);
             return renderErrorPage(res, 'Failed to update how-to-meet. Please try again later.');
+        }
+    }
+];
+
+
+// POST: Governance
+
+exports.p_governance = [
+    validation.validateGovernance,
+    async (req, res) => {
+        const errors = validationResult(req);
+        const { governance } = req.body;
+
+        let standard = {}
+
+        if (req.session.Standard) {
+            standard = req.session.Standard;
+        }
+
+        if (!errors.isEmpty()) {
+            return res.render('create/governance', {
+                standard: standard,
+                errors: errors.array(),
+                governance
+            });
+        }
+
+        try {
+            const updatedStandard = await strapiService.updateGovernance(standard.documentId, governance);
+            req.session.Standard = updatedStandard;
+            return res.redirect('/create/tasks');
+        } catch (error) {
+            console.error('Error updating governance:', error);
+            return renderErrorPage(res, 'Failed to update governance. Please try again later.');
+        }
+    }
+];
+
+// POST: Legality
+
+exports.p_legality = [
+    validation.validateLegality,
+    async (req, res) => {
+        const errors = validationResult(req);
+        const { legality } = req.body;
+
+        let standard = {}
+
+        if (req.session.Standard) {
+            standard = req.session.Standard;
+        }
+
+        if (!errors.isEmpty()) {
+            return res.render('create/legality', {
+                standard: standard,
+                errors: errors.array(),
+                legalStandard: legality
+            });
+        }
+
+        try {
+            const updatedStandard = await strapiService.updateLegality(standard.documentId, legality);
+            req.session.Standard = updatedStandard;
+            return res.redirect('/create/tasks');
+        } catch (error) {
+            console.error('Error updating legality:', error);
+            return renderErrorPage(res, 'Failed to update legality. Please try again later.');
         }
     }
 ];

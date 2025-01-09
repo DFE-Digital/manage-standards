@@ -48,7 +48,7 @@
                         {% for standard in standards %}
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell"><a href="/admin/standard/{{standard.slug}}" class="govuk-link">{{standard.title}}</a></td>
-                                <td class="govuk-table__cell">DDTS-{{standard.id}}</td>
+                                <td class="govuk-table__cell">DDTS-{{standard.standardId}}</td>
                                 <td class="govuk-table__cell">{{standard.version}}</td>
                                 <td class="govuk-table__cell">{{standard.submitted | date('D MMM YYYY')}}</td>
                                 <td class="govuk-table__cell">{{standard.creator.firstName}} {{standard.creator.lastName}}</td>

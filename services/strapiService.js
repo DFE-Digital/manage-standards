@@ -254,6 +254,34 @@ const getStandardBySlug = async (slug) => {
     }
 };
 
+const getStandardById = async (id) => {
+
+    id = parseInt(id);
+
+    if (!id || typeof id !== 'number') {
+        throw new Error("Invalid number: A valid number must be provided.");
+    }
+
+    try {
+        const response = await strapiClient.get(`/api/standards`, {
+            params: {
+                'filters[id][$eq]': id,
+                populate: '*',
+            },
+        });
+
+
+        // Return the standard data
+        return response.data.data[0]; // Assuming slug is unique and returning the first match
+    } catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch standard with id: ${id}`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching standard: ${error.message}`);
+    }
+};
+
 const getDraftsForApproval = async () => {
 
     try {
@@ -322,6 +350,8 @@ const getStandardsDraftByUser = async (userId) => {
         throw new Error(`Error fetching standards: ${error.message}`);
     }
 };
+
+
 const createStandardDraft = async (userId, title) => {
     if (!userId || typeof userId !== 'number') {
         throw new Error("Invalid user ID: A valid numeric user ID must be provided.");
@@ -332,39 +362,79 @@ const createStandardDraft = async (userId, title) => {
     }
 
     try {
-        const payload = {
+        // Step 1: Create the draft
+        const createPayload = {
             data: {
                 title: title,
                 stage: 3,
                 creator: userId,
                 previousVersion: 0,
                 draftCreated: new Date(),
-                slug: title.toLowerCase().replace(/ /g, '-'),
-                publishedAt: null // ensure it remains a draft
+                slug: title
+                    .toLowerCase()
+                    .trim()
+                    .replace(/[^a-z0-9-]+/g, '') // Remove invalid characters
+                    .replace(/\s+/g, '-') // Replace spaces with hyphens
+                    .replace(/-+/g, '-'), // Ensure no multiple hyphens
+                publishedAt: null // Ensure it remains a draft
             }
         };
 
-        const response = await strapiClient.post(`/api/standards?status=draft`, payload);
+        console.log('Creating standard draft with payload:', createPayload);
+        const createResponse = await strapiClient.post(`/api/standards?status=draft`, createPayload);
+        console.log('Draft created successfully:', createResponse.data);
 
-        if (!response || !response.data) {
-            throw new Error("Unexpected response format from Strapi API.");
+        if (!createResponse || !createResponse.data) {
+            throw new Error("Unexpected response format from Strapi API during creation.");
         }
 
-        return response.data.data;
+        const standardId = createResponse.data.data.id;
+        console.log(`Draft ID: ${standardId}`);
+
+        // Step 2: Update the standardId field
+        const updatePayload = {
+            data: {
+                standardId: standardId
+            }
+        };
+
+        let success = false;
+        const maxRetries = 5;
+        let attempt = 0;
+
+        while (!success && attempt < maxRetries) {
+            try {
+                console.log(`Attempt ${attempt + 1} to update standard ID: ${standardId}`);
+                const updateResponse = await strapiClient.put(`/api/standards/${createResponse.data.data.documentId}?status=draft`, updatePayload);
+
+                if (updateResponse && updateResponse.data) {
+                    console.log('Standard ID updated successfully:', updateResponse.data);
+                    success = true;
+                    return updateResponse.data.data;
+                }
+            } catch (updateError) {
+                attempt++;
+                console.error(`Update attempt ${attempt} failed. Retrying in 2 seconds...`);
+                console.error('Error:', updateError.message);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+
+        if (!success) {
+            throw new Error("Failed to update the standard ID after multiple attempts.");
+        }
     } catch (error) {
         if (error.response) {
             console.error('Strapi API Error:', error.response?.data?.error);
-            if (error.response?.data?.error?.details?.errors) {
-                error.response.data.error.details.errors.forEach(err => {
-                    console.error(`Error: ${err.message}`);
-                });
-            }
+            console.error('Details:', error.response?.data?.error?.details);
         }
 
         console.error(`Failed to create standard draft for user ID: ${userId}`, error.message);
         throw new Error(`Error creating standard draft: ${error.message}`);
     }
 };
+
+
 
 const updateTitle = async (id, title) => {
     if (!title || typeof title !== 'string') {
@@ -504,6 +574,86 @@ const updateMeet = async (id, meet) => {
     }
 };
 
+const updateGovernance = async (id, governance) => {
+
+    if (!governance || typeof governance !== 'string') {
+        throw new Error("Invalid governance: A valid governance object must be provided.");
+    }
+
+    try {
+
+        const payload = {
+            data: {
+                governance: governance
+            }
+        };
+        const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Return the updated governance data
+        return response.data.data;
+
+    } catch (error) {
+
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+
+        console.error(`Failed to update governance with ID: ${governance.id}`, error.message);
+        throw new Error(`Error updating governance: ${error.message}`);
+    }
+};
+
+const updateLegality = async (id, legality) => {
+
+    if (!legality || typeof legality !== 'string') {
+        throw new Error("Invalid legality: A valid legality object must be provided.");
+    }
+
+    legality = legality === 'yes' ? 1 : 0;
+
+    console.log(legality);
+
+    try {
+
+        const payload = {
+            data: {
+                legalStandard: legality
+            }
+        };
+
+        const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+        
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Return the updated legality data
+
+        return response.data.data;
+
+    } catch (error) {
+
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to update legality with ID: ${legality.id}`, error.message);
+        throw new Error(`Error updating legality: ${error.message}`);
+    }
+};
+
+
 const getStandardDraft = async (id, userId) => {
     // Get the standard draft by ID and where the creator is the user
 
@@ -558,8 +708,6 @@ const addAdmin = async (firstName, lastName, email) => {
             return response.data.data;
         }
         else {
-
-
 
             const payload = {
                 firstName: firstName,
@@ -664,7 +812,64 @@ const removeAdmin = async (id) => {
     }
 }
 
+const getStandards = async () => {
+
+    try {
+
+        const response = await strapiClient.get(`/api/standards`, {
+            params: {
+                populate: '*',
+                'filters[stage][title][$eq]': 'Published',
+            },
+        });
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Ensure data is an array or handle empty results
+        return response.data.data;
+    }
+    catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch standards`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching standards: ${error.message}`);
+    }
+}
+
+// Returns number of published standards
+const getCountStandards = async () => {
+
+    try {
+
+        const response = await strapiClient.get(`/api/standards`, {
+            params: {
+                'filters[stage][title][$eq]': 'Published',
+                fields: 'id'
+            },
+        });
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Ensure data is an array or handle empty results
+        return response.data.data.length;
+    }
+    catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch standards`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching standards: ${error.message}`);
+    }
+}
+
 
 module.exports = {
-    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin
+    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardById, updateGovernance, updateLegality
 };

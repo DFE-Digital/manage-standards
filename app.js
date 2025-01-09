@@ -63,6 +63,7 @@ markdown.register(nunjuckEnv, marked.parse)
 app.locals.serviceName = process.env.serviceName;
 app.locals.cmsEnabled = process.env.cmsEnabled;
 app.locals.staging = process.env.staging === 'true' ? true : false;
+app.locals.manualURL = process.env.manualURL;
 
 
 // Serve static files from govuk-frontend and dfe-frontend

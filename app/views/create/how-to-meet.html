@@ -1,15 +1,12 @@
 {% extends "layouts/layout.html" %}
-
 {% set selectedNav = "Create" %}
 {% set pageName = "How to meet" %}
 {% set seoPageName = "" %}
 {% set pageDescription = ""%}
 {% set sidenav = 'meet' %}
-
 {% block hero %}
     {% include './_head.html' %}
 {% endblock %}
-
 {% block content %}
     <div class="govuk-width-container ">
         <div class="govuk-grid-row">
@@ -18,7 +15,6 @@
             </div>
             <div class="govuk-grid-column-three-quarters">
                 {% include './errorSummary.html' %}
-
                 <form action="/create/how-to-meet" method="post">
                     <div class="govuk-form-group govuk-character-count {% if errors %}govuk-form-group--error{% endif %}" data-module="govuk-character-count" data-maxlength="10000">
                         <h2 class="govuk-label-wrapper">
@@ -27,9 +23,9 @@
                             </label>
                         </h2>
                         <div id="meet-hint" class="govuk-hint">
-                Include all the requirements for this standard. Detail the actions a team must take to meet the standard. Include links to guidance and support if needed
-              </div>
-                        {% include './_markdown.html' %}
+                  Include all the requirements for this standard. Detail the actions a team must take to meet the standard. Include links to guidance and support if needed
+               </div>
+                      
                         {% if errors %}
                             <p id="event-name-error" class="govuk-error-message">
                                 <span class="govuk-visually-hidden">Error:</span>
@@ -38,20 +34,21 @@
                                 {% endfor %}
                             </p>
                         {% endif %}
-                        <textarea class="govuk-textarea govuk-js-character-count {% if errors %} govuk-input--error{% endif %}" id="meet" name="meet" rows="30" aria-describedby="meet-info meet-hint">{{standard.howToMeet}}</textarea>
+                        <textarea class="govuk-textarea govuk-js-character-count {% if errors %} govuk-input--error{% endif %}" id="meet" name="meet" rows="20" aria-describedby="meet-info meet-hint">{{standard.howToMeet}}</textarea>
                         <div id="meet-info" class="govuk-hint govuk-character-count__message">
-   You can enter up to 10,000 characters. 
-  </div>
+                  You can enter up to 10,000 characters. 
+               </div>
                     </div>
-
                     <div class="govuk-button-group">
                         <button type="submit" class="govuk-button" data-module="govuk-button">
-Save and continue
-  </button>
-
+               Save and continue
+               </button>
                     </div>
-
                 </form>
+
+                {% include './_markdown.html' %}
+
+
             </div>
         </div>
     </div>

@@ -45,7 +45,30 @@ const validateMeet = [
         })
 ];
 
+const validateGovernance = [
+    check('governance')
+        .trim()
+        .custom((value) => {
+            if (value === '') {
+                throw new Error('Enter governance information');
+            }
+            return true;
+        })
+];
+
+
+const validateLegality = [
+    check('legality')
+        .trim()
+        .custom((value) => {
+            if (value === '') {
+                throw new Error('Enter legality information');
+            }
+            return true;
+        })
+];
+
 
 module.exports = {
-    validateTitle, validateSummary, validatePurpose, validateMeet
+    validateTitle, validateSummary, validatePurpose, validateMeet, validateGovernance, validateLegality
 };

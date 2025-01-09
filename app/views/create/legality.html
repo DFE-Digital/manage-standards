@@ -1,0 +1,61 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Create" %}
+{% set pageName = "Is this standard governed or enforced by law?" %}
+{% set seoPageName = "" %}
+{% set pageDescription = "" %}
+{% set sidenav = 'legality' %}
+
+{% block hero %}
+  {% include './_head.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container ">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-quarter">
+        {% include './_sidenav.html' %}
+      </div>
+      <div class="govuk-grid-column-three-quarters">
+        {% include './errorSummary.html' %}
+
+        <form action="/create/legality" method="post" >
+
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset" aria-describedby="legality-hint">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                <h1 class="govuk-fieldset__heading">
+        {{pageName}}
+      </h1>
+              </legend>
+              <div id="legality-hint" class="govuk-hint">
+      This includes law, statutory instruments, regulations, or other legal instruments. {{standard.legalStandard}}
+    </div>
+              <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="legality" name="legality" type="radio" value="yes" {% if standard.legalStandard == true %} checked {% endif %}>
+                  <label class="govuk-label govuk-radios__label" for="legality" >
+          Yes
+        </label>
+                </div>
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="legality-2" name="legality" type="radio" value="no" {% if standard.legalStandard == false  %} checked {% endif %}>
+                  <label class="govuk-label govuk-radios__label" for="legality-2" >
+          No
+        </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+    Save and continue
+  </button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
