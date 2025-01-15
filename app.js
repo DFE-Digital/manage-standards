@@ -21,7 +21,7 @@ const app = express();
 app.use(compression());
 
 const pool = new pg.Pool({
-    connectionString: process.env.SESSION_DATABASE_URL,
+    connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
 
