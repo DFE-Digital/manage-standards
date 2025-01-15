@@ -1,0 +1,116 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Create" %}
+{% set pageName = "Owners and contacts" %}
+{% set seoPageName = "" %}
+{% set pageDescription = ""%}
+
+{% set sidenav = 'people' %}
+{% set view = "standard" %}
+
+{% block hero %}
+    {% include './_head.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-width-container ">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter">
+                {% include './_sidenav.html' %}
+            </div>
+            <div class="govuk-grid-column-three-quarters">
+                {% include './errorSummary.html' %}
+
+                <form action="/create/people" method="post">
+
+                <h2 class="govuk-heading-l">Owners and contacts</h2>
+
+                <p class="govuk-body">Add the owners and contacts for this standard.</p>
+
+                <p class="govuk-body">Owners are accountable for the standard and are responsible for ensuring it is kept up to date. Contacts are individuals who can support with understanding the standard.</p>
+
+
+ {% if standard.owners.length  or standard.contacts.length  %}
+
+                        {% if standard.owners.length  %}
+
+                            <h2 class="govuk-heading-m">Owners</h2>
+
+                            <table class="govuk-table">
+                                <thead class="govuk-table__head">
+                                    <tr class="govuk-table__row">
+                                        <th scope="col" class="govuk-table__header">Name</th>
+                                        <th scope="col" class="govuk-table__header">Email</th>
+                                        <th scope="col" class="govuk-table__header">Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="govuk-table__body">
+                                    {% for person in standard.owners %}
+                                        <tr class="govuk-table__row">
+                                            <td class="govuk-table__cell">
+                                                <a href="/create/people/remove/o/{{person.documentId}}" class="govuk-link">{{ person.firstName }} {{ person.lastName }}</a>
+                                            </td>
+                                            <td class="govuk-table__cell">{{ person.email }}</td>
+                                            <td class="govuk-table__cell">{{ person.JobRole }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                        {% endif %}
+
+                        {% if standard.contacts.length %}
+                            <h2 class="govuk-heading-m">Contacts</h2>
+
+                                <table class="govuk-table">
+                                <thead class="govuk-table__head">
+                                    <tr class="govuk-table__row">
+                                        <th scope="col" class="govuk-table__header">Name</th>
+                                        <th scope="col" class="govuk-table__header">Email</th>
+                                        <th scope="col" class="govuk-table__header">Role</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="govuk-table__body">
+                                    {% for person in standard.contacts %}
+                                        <tr class="govuk-table__row">
+                                            <td class="govuk-table__cell">
+                                                <a href="/create/people/remove/c/{{person.documentId}}" class="govuk-link">{{ person.firstName }} {{ person.lastName }}</a>
+                                            </td>
+                                            <td class="govuk-table__cell">{{ person.email }}</td>
+                                            <td class="govuk-table__cell">{{ person.JobRole }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                        {% endif %}
+                        <p class="govuk-body">
+                            <a href="/create/people/add" class="govuk-link">Add another person</a>.</p>
+
+                        <div class="govuk-button-group">
+                            <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Continue
+                    </button>
+                        </div>
+
+                    {% else %}
+
+                        <div class="govuk-inset-text">
+                            <p class="govuk-body">No people have been added.</p>
+                            <p class="govuk-body">
+                                <a href="/create/people/add" class="govuk-link">Add a person</a>.</p>
+                        </div>
+
+                        <div class="govuk-button-group">
+                            <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Continue
+                    </button>
+                        </div>
+
+                    {% endif %}
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

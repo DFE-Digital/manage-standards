@@ -1,0 +1,125 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Create" %}
+{% set pageName = "Products" %}
+{% set seoPageName = "" %}
+{% set pageDescription = ""%}
+
+{% set sidenav = 'products' %}
+{% set view = "standard" %}
+
+{% block hero %}
+    {% include './_head.html' %}
+{% endblock %}
+
+{% set productError = false %}
+{% set productErrorMsg = false %}
+{% set typeError = false %}
+{% set typeErrorMsg = false %}
+
+{% for error in errors %}
+
+    {% if error.path === 'product' %}
+        {% set productError = true %}
+        {% set productErrorMsg = error.msg %}
+
+    {% endif %}
+
+    {% if error.path === 'producttype' %}
+        {% set typeError = true %}
+        {% set typeErrorMsg = error.msg %}
+    {% endif %}
+
+{% endfor %}
+
+{% block content %}
+    <div class="govuk-width-container ">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter">
+                {% include './_sidenav.html' %}
+            </div>
+            <div class="govuk-grid-column-three-quarters">
+                {% include './errorSummary.html' %}
+
+                <form action="/create/products/add" method="post">
+                    <h1 class="govuk-heading-l ">Approved and tolerated products</h1>
+
+                    <p class="govuk-body">Add any products that are approved or tolerated for this standard. You can refer to the <a href="/guidance/products" class="govuk-link" target="_blank">products guidance</a> for more information.</p>
+
+                    <p class="govuk-body">If a product is not listed, you should <a href="/support" class="govuk-link">contact the standards forum</a> before continuing.</p>
+
+                    <div class="govuk-form-group {% if productError %}govuk-form-group--error{% endif %}">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <h2 class="govuk-fieldset__heading">
+Select a product
+      </h2>
+                        </legend>
+                        {% if productError%}
+                            <span class="govuk-error-message">{{ productErrorMsg }}</span>
+                        {% endif %}
+                        <select class="govuk-select govuk-!-width-one-half autocomplete" id="product" name="product">
+                            <option value=""></option>
+                            {% for product in products %}
+                                <option value="{{ product.documentId }}" {% if formData == product.documentId %}selected{% endif %}>{{ product.title }} - {{product.vendor}} ({{product.version}})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="govuk-form-group {% if typeError %}govuk-form-group--error{% endif %}">
+                        <fieldset class="govuk-fieldset" aria-describedby="producttype-hint">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                <h2 class="govuk-fieldset__heading">
+        Is this product approved or tolerated for use with this standard?
+      </h2>
+                            </legend>
+                            {% if typeError %}
+                                <p id="producttype-error" class="govuk-error-message">
+                                    <span class="govuk-visually-hidden">Error:</span>
+                                    {{typeErrorMsg}}
+                                </p>
+                            {% endif %}
+                            <div id="producttype-hint" class="govuk-hint">
+    Select one option.
+    </div>
+                            <div class="govuk-radios" data-module="govuk-radios">
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="producttype" name="producttype" type="radio" value="Approved" aria-describedby="producttype-item-hint">
+                                    <label class="govuk-label govuk-radios__label" for="sigproducttypenIn">
+          Approved
+        </label>
+                                    <div id="producttype-item-hint" class="govuk-hint govuk-radios__hint">
+         Approved products are those that have been tested and approved for use with this standard.
+        </div>
+                                </div>
+                                <div class="govuk-radios__item">
+                                    <input class="govuk-radios__input" id="producttype-2" name="producttype" type="radio" value="Tolerated" aria-describedby="producttype-2-item-hint">
+                                    <label class="govuk-label govuk-radios__label" for="producttype-2">
+          Tolerated
+        </label>
+                                    <div id="producttype-2-item-hint" class="govuk-hint govuk-radios__hint">
+            Tolerated products may be in use with existing products and services, but are not to be used for new products or services.
+        </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Add product
+                    </button>
+                      <a class="govuk-link" href="/create/products">Cancel and return to products</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        accessibleAutocomplete.enhanceSelectElement({defaultValue: '', selectElement: document.querySelector('.autocomplete')});
+    </script>
+{% endblock %}

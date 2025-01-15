@@ -53,7 +53,7 @@
 
                                         <tr class="govuk-table__row">
                                             <th scope="row" class="govuk-table__header">
-                                                <a href="/create/getdraft/{{draft.id}}" class="govuk-link">
+                                                <a href="/create/getdraft/{{draft.documentId}}" class="govuk-link">
                                                     {% if draft.title %}
                                                         {{ draft.title }}
                                                     {% else %}
@@ -61,7 +61,7 @@
 {% endif %}
                                                 </a>
                                             </th>
-                                            <td class="govuk-table__cell">DDTS-{{draft.id }}</td>
+                                            <td class="govuk-table__cell">DDTS-{{draft.standardId }}</td>
                                             <td class="govuk-table__cell">{{draft.createdAt | date('DD MMM YYYY')}}</td>
                                         </tr>
                                     {% endfor %}

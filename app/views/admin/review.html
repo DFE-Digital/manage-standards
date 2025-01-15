@@ -10,7 +10,7 @@
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
                       <a href="/admin" class="govuk-back-link">Back</a>
-                    <h1 class="govuk-heading-xl govuk-!-padding-top-5 govuk-!-padding-bottom-0">{{pageName}}</h1>
+                    <h1 class="govuk-heading-xl govuk-!-padding-top-0 govuk-!-padding-bottom-0">{{pageName}}</h1>
                     <nav class="app-sub-navigation" aria-label="Application menu">
                         <ul class="app-sub-navigation__list">
                             <li class="app-sub-navigation__item">
@@ -47,9 +47,9 @@
                     <tbody class="govuk-table__body">
                         {% for standard in standards %}
                             <tr class="govuk-table__row">
-                                <td class="govuk-table__cell"><a href="/admin/standard/{{standard.slug}}" class="govuk-link">{{standard.title}}</a></td>
+                                <td class="govuk-table__cell"><a href="/admin/standard/{{standard.documentId}}" class="govuk-link">{{standard.title}}</a></td>
                                 <td class="govuk-table__cell">DDTS-{{standard.standardId}}</td>
-                                <td class="govuk-table__cell">{{standard.version}}</td>
+                                <td class="govuk-table__cell">v.{{standard.version}}</td>
                                 <td class="govuk-table__cell">{{standard.submitted | date('D MMM YYYY')}}</td>
                                 <td class="govuk-table__cell">{{standard.creator.firstName}} {{standard.creator.lastName}}</td>
                             </tr>

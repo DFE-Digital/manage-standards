@@ -1,0 +1,74 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Create" %}
+{% set pageName = "Categories" %}
+{% set seoPageName = "" %}
+{% set pageDescription = "" %}
+{% set sidenav = 'categories' %}
+
+{% block hero %}
+    {% include './_head.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-width-container ">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter">
+                {% include './_sidenav.html' %}
+            </div>
+            <div class="govuk-grid-column-three-quarters">
+                {% include './errorSummary.html' %}
+
+                <form action="/create/categories" method="post" >
+
+                 <div class="govuk-form-group">
+  <fieldset class="govuk-fieldset" aria-describedby="waste-hint">
+  <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+      <h2 class="govuk-fieldset__heading">
+        Which categories does this standard apply to?
+      </h2>
+    </legend>
+    <div id="waste-hint" class="govuk-hint">
+      Select all that apply. You can refer to the <a href="/guidance/categories" class="govuk-link" target="_blank">categories guidance</a> for more information.
+    </div>
+    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+        {% for category in categories %}
+      <div class="govuk-checkboxes__item">
+        <input class="govuk-checkboxes__input" id="category-{{loop.index}}" name="category" type="checkbox" value="{{category.documentId}}" aria-describedby="category-item-hint" {% set isChecked = false %}
+               {% if standard.categories | length > 0%}
+                   {% for selectedCategory in standard.categories %}
+                       {% if selectedCategory.documentId == category.documentId %}
+                           {% set isChecked = true %}
+                       {% endif %}
+                   {% endfor %}
+               {% endif %}
+
+               {% if isChecked %}
+               checked
+               {% endif %}>
+        <label class="govuk-label govuk-checkboxes__label" for="category-{{loop.index}}">
+          {{category.title}}
+        </label>
+        <div id="category-item-hint" class="govuk-hint govuk-checkboxes__hint">
+          {{category.description}}
+        </div>
+      </div>
+      {% endfor %}
+  
+    </div>
+  </fieldset>
+</div>
+
+
+
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+    Save and continue
+  </button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

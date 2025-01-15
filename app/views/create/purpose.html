@@ -21,7 +21,7 @@
 
                 <form action="/create/purpose" method="post" >
 
-                    <div class="govuk-form-group govuk-character-count {% if errors %} govuk-form-group--error{% endif %}" data-module="govuk-character-count" data-maxlength="5000">
+                    <div class="govuk-form-group govuk-character-count {% if errors %} govuk-form-group--error{% endif %}" data-module="govuk-character-count" data-maxlength="2000">
                         <h2 class="govuk-label-wrapper">
                             <label class="govuk-label govuk-label--l" for="purpose">
                                 {{pageName}}
@@ -39,9 +39,9 @@
                                 {% endfor %}
                             </p>
                         {% endif %}
-                        <textarea class="govuk-textarea govuk-js-character-count {% if errors %} govuk-input--error{% endif %}" id="purpose" name="purpose" rows="15" aria-describedby="purpose-info purpose-hint-hint">{{standard.purpose}}</textarea>
+                        <textarea class="govuk-textarea govuk-js-character-count {% if errors %} govuk-input--error{% endif %}" id="purpose" name="purpose" rows="10" aria-describedby="purpose-info purpose-hint-hint">{{standard.purpose}}</textarea>
                         <div id="purpose-info" class="govuk-hint govuk-character-count__message">
-    You can enter up to 5,000 characters
+    You can enter up to 2,000 characters
   </div>
                     </div>
 

@@ -1,0 +1,59 @@
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-3 govuk-!-margin-top-0">{{ standard.title }}</h1>
+
+<table class="govuk-table  govuk-!-margin-bottom-5">
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th class="govuk-table__header" scope="col">Reference</th>
+            <th class="govuk-table__header" scope="col">Stage</th>
+            <th class="govuk-table__header" scope="col">Version</th>
+            <th class="govuk-table__header" scope="col">Published</th>
+            <th class="govuk-table__header" scope="col">Updated</th>
+            <th class="govuk-table__header" scope="col">View</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell">DDTS-{{standard.standardId}}</td>
+            <td class="govuk-table__cell">
+                {% if standard.stage.title === 'Draft' %}
+                <strong class="govuk-tag govuk-tag--yellow">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Approval' %}
+                <strong class="govuk-tag govuk-tag--orange">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Approved' %}
+                <strong class="govuk-tag govuk-tag--green">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Rejected' %}
+                <strong class="govuk-tag govuk-tag--red">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Published' %}
+                <strong class="govuk-tag govuk-tag--blue">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Archived' %}
+                <strong class="govuk-tag govuk-tag--grey">{{standard.stage.title}}</strong>
+                {% endif %}
+            </td>
+            <td class="govuk-table__cell">v.{{standard.version}}</td>
+            <td class="govuk-table__cell">{{standard.firstPublished | date('D MMM YYYY')}}</td>
+            <td class="govuk-table__cell">{{standard.lastUpdated | date('D MMM YYYY')}}</td>
+            <td class="govuk-table__cell">
+                <a href="https://standards.education.gov.uk/standard/{{standard.standardId}}">View standard</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<nav class="app-sub-navigation" aria-label="Application menu">
+    <ul class="app-sub-navigation__list">
+        {% if standard.stage.title === 'Published' %}
+        <li class="app-sub-navigation__item">
+            <a class="app-sub-navigation__link" {% if view==='compliance' %} aria-current="page" {% endif
+                                %} href="/standards/standard/{{standard.documentId}}">Compliance</a>
+        </li>
+        {% endif %}
+        <li class="app-sub-navigation__item">
+            <a class="app-sub-navigation__link" {% if view==='manage' %} aria-current="page" {% endif
+                                %}href="/standards/standard/manage/{{standard.documentId}}">Manage</a>
+        </li>
+        <li class="app-sub-navigation__item">
+            <a class="app-sub-navigation__link" {% if view==='history' %} aria-current="page" {% endif
+                                %}href="/standards/standard/history/{{standard.documentId}}">Change history</a>
+        </li>
+    </ul>
+</nav>

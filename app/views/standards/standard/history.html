@@ -1,0 +1,36 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Dashboard" %}
+{% set pageName = standard.title %}
+{% set view = 'history' %}
+
+{% block hero %}
+    <div class="dfe-page-header dfe-page-header--with-sub-nav">
+        <div class="govuk-width-container dfe-width-container ">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <a href="/standards" class="govuk-back-link">Back</a>
+                  {% include './_head.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+
+           
+
+        </div>
+           <div class="govuk-grid-column-three-quarters">
+
+           <p class="govuk-body">Change history is not currently available.</p>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

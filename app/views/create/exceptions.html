@@ -1,0 +1,78 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Create" %}
+{% set pageName = "Known exceptions" %}
+{% set seoPageName = "" %}
+{% set pageDescription = ""%}
+
+{% set sidenav = 'exceptions' %}
+{% set view = "standard" %}
+
+{% block hero %}
+    {% include './_head.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-width-container ">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter">
+                {% include './_sidenav.html' %}
+            </div>
+            <div class="govuk-grid-column-three-quarters">
+                {% include './errorSummary.html' %}
+
+                      <form action="/create/people" method="get">
+
+                    <h2 class="govuk-heading-l">Known exceptions</h2>
+
+                    <p>Known exceptions that apply to this standard.</p>
+
+                    {% if standard.exceptions.length %}
+
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header govuk-!-width-one-third">Summary</th>
+                                    <th scope="col" class="govuk-table__header">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                {% for exception in standard.exceptions %}
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell">
+                                            <a href="/create/exceptions/remove/{{exception.documentId}}">{{ exception.title }}</a>
+                                        </td>
+                                        <td class="govuk-table__cell">{{ exception.details | truncate(100) }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                           <p class="govuk-body">
+                            <a href="/create/exceptions/add" class="govuk-link">Add another exception</a>.</p>
+
+                        <div class="govuk-button-group">
+                            <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Continue
+                    </button>
+                        </div>
+                    {% else %}
+
+                        <div class="govuk-inset-text">
+                            <p class="govuk-body">No exceptions have been added.</p>
+                            <p class="govuk-body">
+                                <a href="/create/exceptions/add" class="govuk-link">Add an exception</a>.</p>
+                        </div>
+
+                        <div class="govuk-button-group">
+                            <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Continue without adding exceptions
+                    </button>
+                        </div>
+                    {% endif %}
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

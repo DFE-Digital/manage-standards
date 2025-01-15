@@ -1,0 +1,89 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Create" %}
+{% set pageName = "Sub-categories" %}
+{% set seoPageName = "" %}
+{% set pageDescription = "" %}
+{% set sidenav = 'subcategories' %}
+
+{% block hero %}
+  {% include './_head.html' %}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-width-container ">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-quarter">
+        {% include './_sidenav.html' %}
+      </div>
+      <div class="govuk-grid-column-three-quarters">
+        {% include './errorSummary.html' %}
+
+        <form action="/create/subcategories" method="post" >
+
+        <h1 class="govuk-heading-l ">What subcategories apply to this standard?</h1>
+
+
+           <p id class="govuk-body">
+      Select all that apply. You can refer to the <a href="/guidance/categories" class="govuk-link" target="_blank">categories guidance</a> for more information.
+    </p>
+
+      {% for category in standard.categories %}
+                 <div class="govuk-form-group">
+
+    <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            {{ category.title }}
+        </legend>
+        <div class="govuk-checkboxes">
+            {% for subCategory in filteredSubCategories %}
+                {% if subCategory.category.documentId == category.documentId %}
+                    <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" 
+                               id="subCategory-{{ subCategory.id }}" 
+                               name="categories" 
+                               type="checkbox" 
+                               value="{{ subCategory.documentId }}"
+                               
+                                {% set isChecked = false %}
+               {% if standard.sub_categories.length > 0 %}
+                   {% for selectedCategory in standard.sub_categories %}
+                       {% if selectedCategory.documentId == subCategory.documentId %}
+                           {% set isChecked = true %}
+                       {% endif %}
+                   {% endfor %}
+               {% endif %}
+
+               {% if isChecked %}
+               checked
+               {% endif %} >
+                        <label class="govuk-label govuk-checkboxes__label" for="subCategory-{{ subCategory.id }}">
+                            {{ subCategory.title }}
+                        </label>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </fieldset>
+
+
+</div>
+{% endfor %}
+
+
+
+
+          <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+    Save and continue
+  </button>
+
+
+
+
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

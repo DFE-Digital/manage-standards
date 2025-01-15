@@ -33,7 +33,7 @@ app.use(session({
         tableName: 'sessions'
     }),
     secret: process.env.SESSION_KEY,
-    resave: false,
+    resave: true,
     rolling: true,
     saveUninitialized: false,
     cookie: { maxAge: 365 * 24 * 60 * 60 * 1000 }
@@ -59,6 +59,11 @@ var nunjuckEnv = nunjucks.configure([
 
 nunjuckEnv.addFilter('date', dateFilter)
 markdown.register(nunjuckEnv, marked.parse)
+
+// Create a nunjucks filter to format version numbers to 2 dp
+nunjuckEnv.addFilter('formatVersion', function (num) {
+    return parseFloat(num).toFixed(2);
+});
 
 app.locals.serviceName = process.env.serviceName;
 app.locals.cmsEnabled = process.env.cmsEnabled;

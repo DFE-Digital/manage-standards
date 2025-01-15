@@ -41,41 +41,39 @@
                     <li>publish and unpublish standards</li>
                 </ul>
 
-<div class="govuk-summary-card">
-  <div class="govuk-summary-card__title-wrapper">
-    <h2 class="govuk-summary-card__title">
+                <div class="govuk-summary-card">
+                    <div class="govuk-summary-card__title-wrapper">
+                        <h2 class="govuk-summary-card__title">
       Active administrators
     </h2>
-    <ul class="govuk-summary-card__actions">
-      <li class="govuk-summary-card__action">
-        <a class="govuk-link" href="/admin/admins/add">Add administrator</a>
-      </li>
-    </ul>
-  </div>
-  <div class="govuk-summary-card__content">
-                <table class="govuk-table">
-                    <thead class="govuk-table__head">
-                        <tr class="govuk-table__row">
-                            <th class="govuk-table__header govuk-!-width-one-third" scope="col">Name</th>
-                            <th class="govuk-table__header" scope="col">Email address</th>
-                        </tr>
-                    </thead>
-                    <tbody class="govuk-table__body">
-                        {% for admin in admins %}
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">
-                                    <a href="/admin/admins/person/{{admin.id}}" class="govuk-link">{{admin.firstName}}
-                                        {{admin.lastName}}</a>
-                                </td>
-                                <td class="govuk-table__cell">{{admin.email}}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                  </div>
+                        <ul class="govuk-summary-card__actions">
+                            <li class="govuk-summary-card__action">
+                                <a class="govuk-link" href="/admin/admins/add">Add administrator</a> 
+                            </li>
+                        </ul>
                     </div>
-
-
+                    <div class="govuk-summary-card__content">
+                        <table class="govuk-table">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th class="govuk-table__header govuk-!-width-one-third" scope="col">Name</th>
+                                    <th class="govuk-table__header" scope="col">Email address</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                {% for admin in admins %}
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell">
+                                            <a href="/admin/admins/person/{{admin.id}}" class="govuk-link">{{admin.firstName}}
+                                                {{admin.lastName}}</a>
+                                        </td>
+                                        <td class="govuk-table__cell">{{admin.email}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
             </div>
         </div>

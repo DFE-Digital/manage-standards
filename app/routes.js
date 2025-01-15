@@ -15,11 +15,19 @@ const adminController = require('./controllers/adminController.js');
 
 
 function isAuthenticated(req, res, next) {
-    console.log(req.session);
+ 
     if (req.session && req.session.User) {
         res.locals.user = req.session.User;
         return next();
     } else {
+
+        // if the route starts with router.get('/create/preview', then send to a page to say they need to be signed in, and then try again
+
+        if(req.originalUrl.startsWith('/create/preview')) {
+            return res.redirect('/need-to-sign-in');
+        }
+
+
         return res.redirect('/sign-in');
     }
 }
@@ -56,38 +64,72 @@ router.get('/dashboard', isAuthenticated, dashboardController.g_dashboard);
 
 // Standards routes
 router.get('/standards', isAuthenticated, standardsController.g_standards);
+router.get('/standards/standard/:documentId', isAuthenticated, standardsController.g_standard);
+router.get('/standards/standard/manage/:documentId', isAuthenticated, standardsController.g_standard_manage);
+router.get('/standards/standard/history/:documentId', isAuthenticated, standardsController.g_standard_history);
+
+router.get('/standards/standard/edit-section/:section/:documentId', isAuthenticated, standardsController.g_standard_edit_section);
+
 router.get('/standard/:slug', isAuthenticated, standardsController.g_standardBySlug);
 router.get('/standard/:slug/history', isAuthenticated, standardsController.g_standardHistoryBySlug);
 
+
 // Create routes
 router.get('/create', isAuthenticated, createController.g_start);
-router.get('/create/getdraft/:id', isAuthenticated, createController.g_getdraft);
+router.get('/create/getdraft/:documentId', isAuthenticated, createController.g_getdraft);
 router.get('/create/new', isAuthenticated, createController.g_new);
 router.get('/create/tasks', isAuthenticated, createController.g_tasks);
 router.get('/create/title', isAuthenticated, createController.g_title);
 router.get('/create/summary', isAuthenticated, createController.g_summary);
 router.get('/create/purpose', isAuthenticated, createController.g_purpose);
 router.get('/create/how-to-meet', isAuthenticated, createController.g_meet);
+router.get('/create/categories', isAuthenticated, createController.g_categories);
+router.get('/create/sub-categories', isAuthenticated, createController.g_subcategories);
 router.get('/create/governance', isAuthenticated, createController.g_governance);
+router.get('/create/products', isAuthenticated, createController.g_products);
+router.get('/create/products/add', isAuthenticated, createController.g_add_products);
+router.get('/create/products/remove/:t/:documentId', isAuthenticated, createController.g_remove_product);
+router.get('/create/exceptions', isAuthenticated, createController.g_exceptions);
+router.get('/create/exceptions/add', isAuthenticated, createController.g_add_exception);
+router.get('/create/exceptions/remove/:documentId', isAuthenticated, createController.g_remove_exception);
+router.get('/create/people', isAuthenticated, createController.g_people);
+router.get('/create/people/add', isAuthenticated, createController.g_add_people);
+router.get('/create/people/remove/:t/:documentId', isAuthenticated, createController.g_remove_person);
+router.get('/create/validity', isAuthenticated, createController.g_validity);
 router.get('/create/legality', isAuthenticated, createController.g_legality);
+router.get('/create/preview/:documentId', isAuthenticated, createController.g_preview);
+router.get('/create/confirm-delete', isAuthenticated, createController.g_confirm_delete);
+router.get('/create/complete', isAuthenticated, createController.g_complete);
 
 router.post('/create/title', isAuthenticated, createController.p_title);
 router.post('/create/summary', isAuthenticated, createController.p_summary);
 router.post('/create/purpose', isAuthenticated, createController.p_purpose);
 router.post('/create/how-to-meet', isAuthenticated, createController.p_meet);
+router.post('/create/categories', isAuthenticated, createController.p_categories);
+router.post('/create/subcategories', isAuthenticated, createController.p_subcategories);
 router.post('/create/governance', isAuthenticated, createController.p_governance);
 router.post('/create/legality', isAuthenticated, createController.p_legality);
+router.post('/create/products/add', isAuthenticated, createController.p_add_products);
+router.post('/create/products/remove', isAuthenticated, createController.p_remove_products);
+router.post('/create/exception/remove', isAuthenticated, createController.p_remove_exception);
+router.post('/create/validity', isAuthenticated, createController.p_validity);
+router.post('/create/people/add', isAuthenticated, createController.p_add_person);
+router.post('/create/people', isAuthenticated, createController.p_people);
+router.post('/create/person/remove', isAuthenticated, createController.p_remove_person);
+router.post('/create/exceptions/add', isAuthenticated, createController.p_add_exception);
+router.post('/create/standard/submit', isAuthenticated, createController.p_submit);
 
 // Admin routes
 router.get('/admin', isAuthenticated, isAdmin, adminController.g_admin);
 router.get('/admin/review', isAuthenticated, isAdmin, adminController.g_review);
 router.get('/admin/standards', isAuthenticated, isAdmin, adminController.g_standards);
-router.get('/admin/standard/:id', isAuthenticated, isAdmin, adminController.g_standard);
 router.get('/admin/admins', isAuthenticated, isAdmin, adminController.g_admins);
 router.get('/admin/admins/person/:id', isAuthenticated, isAdmin, adminController.g_person);
+router.get('/admin/standard/:documentId', isAuthenticated, isAdmin, adminController.g_standard);
 
 router.post('/admin/admins/add', isAuthenticated, isAdmin, adminController.p_add_admin);
 router.post('/admin/admins/remove', isAuthenticated, isAdmin, adminController.p_remove_admin);
+router.post('/admin/standard/outcome', isAuthenticated, isAdmin, adminController.p_submit_outcome);
 
 
 

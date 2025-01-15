@@ -60,7 +60,7 @@
                         <div class="govuk-task-list__status" id="standard-details-2-status">
 
                             {% if standard.title %}
-                                {% if standard.category %}
+                                {% if standard.categories.length %}
                                 Complete
                             {% else %}
                                     <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
@@ -80,10 +80,10 @@
                         </div>
                         <div class="govuk-task-list__status" id="standard-details-3-status">
                             {% if standard.title %}
-                                {% if standard.subCategory %}
+                                {% if standard.sub_categories.length %}
                                 Complete
-                            {% else %}
-                                    {% if standard.category %}
+                                {% else %}
+                                    {% if standard.categories.length %}
                                         <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
                                     {% else %}
                                         <strong class="govuk-tag govuk-tag--grey">Cannot start yet</strong>
@@ -138,11 +138,12 @@
                         </div>
                         <div class="govuk-task-list__status" id="standard-details-5-status">
                             {% if standard.title %}
-                                {% if standard.approvedProducts or standard.toleratedProducts %}
+
+                                {% if standard.approvedProducts.length or standard.toleratedProducts.length %}
 
                                     {% set number = standard.approvedProducts | length + standard.toleratedProducts | length %}
 
-                                    {{ number }} product{% if number > 1 %}s{% endif %}
+                                    {{ number }} product{% if number !== 1 %}s{% endif %}
                                 {% else %}
                                     <strong class="govuk-tag govuk-tag--blue">Optional</strong>
                                 {% endif %}
@@ -161,7 +162,7 @@
                             {% if standard.title %}
                                 {% if standard.exceptions %}
 
-                                    {{ standard.exceptions | length }} exception{% if standard.exceptions | length > 1 %}s{% endif %}
+                                    {{ standard.exceptions | length }} exception{% if standard.exceptions | length !== 1 %}s{% endif %}
                                 {% else %}
                                     <strong class="govuk-tag govuk-tag--blue">Optional</strong>
                                 {% endif %}
@@ -172,17 +173,18 @@
                     </li>
                     <li class="govuk-task-list__item govuk-task-list__item--with-link">
                         <div class="govuk-task-list__name-and-hint">
-                            <a class="govuk-link govuk-task-list__link" href="/create/contacts" aria-describedby="standard-details-5-status">
+                            <a class="govuk-link govuk-task-list__link" href="/create/people" aria-describedby="standard-details-5-status">
         Owner and contacts
       </a>
                         </div>
                         <div class="govuk-task-list__status" id="standard-details-5-status">
                             {% if standard.title %}
-                                {% if standard.owners or standard.technicalContacts %}
+                                {% if standard.owners or standard.contacts %}
 
-                                    {% set number = standard.owners | length + standard.technicalContacts | length %}
+                                    {% set number = standard.owners.length + standard.contacts.length %}
 
-                                    {{ number }} contact{% if number > 1 %}s{% endif %}
+                                    {{ number }}
+                                    {% if number !== 1 %}people{% else%}person{% endif %}
 
                                 {% else %}
                                     <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
@@ -202,7 +204,7 @@
                         </div>
                         <div class="govuk-task-list__status" id="standard-details-5-status">
                             {% if standard.title %}
-                                {% if standard.validity %}
+                                {% if standard.validityPeriod %}
 Complete
                             {% else %}
                                     <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
@@ -256,7 +258,7 @@ Complete
 
                 {% set isSubmittable = false %}
 
-                {% if standard.title and standard.summary and standard.purpose and standard.guidance and standard.category and standard.subCategory and(standard.technicalContacts or standard.owners)and standard.governance and standard.validity and standard.legalStandard %}
+                {% if standard.title and standard.summary and standard.purpose and standard.howToMeet and standard.categories and standard.sub_categories and standard.owners and standard.governance and standard.validityPeriod and standard.legalStandard %}
 
                     {% set isSubmittable = true %}
 
@@ -264,25 +266,38 @@ Complete
 
                 {% if isSubmittable %}
 
-                    <h2 class="govuk-heading-l">Submit draft for approval</h2>
+                    <h2 class="govuk-heading-l">Submit draft for review</h2>
 
-                    <p>You can now submit this draft for review by the standards forum.</p>
+                    <p class="govuk-body">You have completed all the required information for the standard forums to review this standard.</p>
+
+                    <h3 class="govuk-heading-m">Before you submit</h3>
+
+                    <p class="govuk-body">Make sure you have:</p>
+
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>checked the content is written using plain English and plain language</li>
+                        <li>spelt out any acronyms, abbreviations, and initialisms in full</li>
+                        <li>checked any links to external content are working</li>
+                        <li>use the <a href="/create/preview/{{standard.documentId}}" class="govuk-link govuk-link--no-visited-state" target="_blank">preview option</a> to check how the standard will look when published </li>
+                    </ul>
+
+                    <p>When you submit the draft, you'll be contacted by the standards forum for the review stage.</p>
 
                 {% else %}
                     <h2 class="govuk-heading-l">You cannot submit this draft</h2>
-                    <p>You need to complete all the required tasks before you can submit this standard for review.</p>
+                    <p class="govuk-body">You need to complete all the required tasks before you can submit this standard for review.</p>
 
                 {% endif %}
 
                 <form action="/create/standard/submit" method="post">
                     {% if isSubmittable %}
                         <button type="submit" name="action" value="Submit" class="govuk-button" data-module="govuk-button">
-                    Submit for approval
+                    Submit for review
                 </button>
                     {% endif %}
 
                     <h2 class="govuk-heading-l">Delete draft</h2>
-                    <p>If you no longer need this draft, you can delete it.</p>
+                    <p class="govuk-body">If you no longer need this draft, you can delete it.</p>
                     <button type="submit"  name="action" value="Delete" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                     Delete draft standard
                 </button>
@@ -295,13 +310,15 @@ Complete
                 <aside class="dfe-aside">
                     <h2 class="govuk-heading-m">Preview standard</h2>
 
-                    <p><a href="/standard/preview/{{standard.documentId}}">Open preview in a new tab</a></p>
+                    <p class="govuk-body">
+                        <a href="/create/preview/{{standard.documentId}}" class="govuk-link govuk-link--no-visited-state" target="_blank">Open preview in a new tab</a>
+                    </p>
 
-                    <p>You can share the draft standard with others. Only users with access to this service and the link, can preview this standard.</p>
+                    <p class="govuk-body">You can share the draft standard with others. Only users with access to this service and the link, can preview this standard.</p>
 
-                    <p>You will not be able to share this standard publicly.</p>
-                    
+                    <p class="govuk-body">You will not be able to share this standard publicly.</p>
+
+                </div>
             </div>
         </div>
-    </div>
-{% endblock %}
+    {% endblock %}

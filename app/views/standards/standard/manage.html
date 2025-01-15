@@ -1,0 +1,198 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Dashboard" %}
+{% set pageName = standard.title %}
+{% set view = 'manage' %}
+
+{% block hero %}
+    <div class="dfe-page-header dfe-page-header--with-sub-nav">
+        <div class="govuk-width-container dfe-width-container ">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <a href="/standards" class="govuk-back-link">Back</a>
+                    {% include './_head.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="govuk-width-container">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter"></div>
+        <div class="govuk-grid-column-three-quarters">
+
+            {% if standard.stage.title === 'Approval' %}
+
+                <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Important</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">This standard is being reviewed by the standards forum.</p>
+                        <p class="govuk-body">You can make changes until review.</p>
+                    </div>
+                </div>
+
+            {% endif %}
+
+            {% if standard.stage.title === 'Approved' %}
+
+                <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Important</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">This standard can be published.</p>
+                        <form method="post" action="/standards/standard/publish/{{ standard.documentId }}">
+                            <div class="govuk-button-group">
+                                <button type="submit" class="govuk-button" name="action" value="publish">Publish</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            {% endif %}
+
+            {% if standard.stage.title === 'Rejected' %}
+
+                <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Important</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">This standard can't be published and you need to make some changes.</p>
+                        <form method="post" action="/standards/standard/revert/{{ standard.documentId }}">
+                            <div class="govuk-button-group">
+                                <button type="submit" class="govuk-button">Revert to draft</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            {% endif %}
+
+            {% if standard.stage.title === 'Published' %}
+
+                <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Important</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">This standard is published.</p>
+                        <p class="govuk-body">To make changes you will need to create a new draft version.</p>
+
+                        <form method="post" action="/standards/standard/revert/{{ standard.documentId }}">
+                            <div class="govuk-button-group">
+                                <button type="submit" class="govuk-button">Revert to draft</button>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+            {% endif %}
+
+            {% if mode == 'edit' and section == 'summary' %}
+            {% include './_summary.html' %}
+            {% else %}
+                <section id="summary" class="editable" tabindex="0">
+                    <div class="edit-bar">
+                        <a href="/standards/standard/edit-section/summary/{{standard.documentId}}" class="govuk-link govuk-link--inverse">Edit this section</a>
+                    </div>
+
+                    <h2>Summary</h2>
+                    {% markdown %}
+                    {{standard.summary}}
+                    {% endmarkdown %}
+                </section>
+
+            {% endif %}
+
+            <section id="why" class="editable" tabindex="0">
+                <div class="edit-bar">
+                    <a href="#" class="govuk-link govuk-link--inverse">Edit this section</a>
+                </div>
+
+                <h2>Purpose</h2>
+                {% markdown %}
+                {{standard.purpose}}
+                {% endmarkdown %}
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Base styles for the section */
+    .editable {
+        position: relative;
+        border: 1px solid transparent;
+        border-top: 1px dashed #555555;
+        padding: 16px;
+        margin-bottom: 16px;
+        transition: border 0.3s ease, background-color 0.3s ease;
+    }
+
+    /* Highlight on hover or focus */
+    .editable:focus-within,
+    .editable:hover {
+        border: 1px dashed #0078d4;
+        background-color: #f3f9ff;
+        outline: none;
+        /* Remove default focus outline */
+    }
+
+    /* Edit bar styling */
+    .edit-bar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: #555555;
+
+        padding: 8px 12px;
+        font-size: 1rem;
+        border-radius: 0 0 0 10px;
+        z-index: 10;
+    }
+
+    .edit-bar a {
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .edit-bar a:hover {
+        text-decoration: underline;
+    }
+
+    /* Show edit bar on hover or focus */
+    .editable:focus-within .edit-bar,
+    .editable:hover .edit-bar {
+        background-color: #0078d4;
+        display: block;
+        transition: border 0.3s ease, background-color 0.3s ease;
+    }
+
+    /* For accessibility, ensure focus management */
+    .editable:focus-within .edit-bar {
+        display: block;
+    }
+</style>
+
+ <script>
+        // Automatically scroll to the anchor if a section is provided
+        const section = "{{section}}"; // Dynamically rendered variable
+        if (section) {
+            const target = document.getElementById(section);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+
+{% endblock %}

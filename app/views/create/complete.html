@@ -1,0 +1,41 @@
+{% extends "layouts/layout.html" %}
+{% set selectedNav = "Create" %}
+{% set pageName = "Standard submitted" %}
+{% set seoPageName = "" %}
+{% set pageDescription = ""%}
+{% set view = "standard" %}
+
+{% block content %}
+    <div class="govuk-width-container ">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+
+                <div class="govuk-panel govuk-panel--confirmation">
+                    <h1 class="govuk-panel__title">
+    Standard submitted for review
+  </h1>
+                    <div class="govuk-panel__body">
+    Your standard reference:<br/>
+                        <strong>DDTS-{{standard.standardId}}</strong>
+                    </div>
+                </div>
+
+                <h2 class="govuk-heading-l">What happens next</h2>
+
+                <p class="govuk-body">Your standard has been submitted for review. You will receive an email confirmation shortly.</p>
+
+                <p class="govuk-body">The standards forum will contact you to discuss the standard and decide on the outcome, which could be:</p>
+
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>approval and publish the standard</li>
+                    <li>rejection where you need to make changes and resubit or reconsider the standard</li>
+                </ul>
+
+                <p class="govuk-body">You can view your standards and their progress from the <a href="/dashboard" class="govuk-link">dashboard</a>.</p>
+
+                
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,27 @@
+<!-- app/views/index.html -->
+{% extends "layouts/publiclayout.html" %}
+{% set selectedNav = "Home" %}
+{% set pagePath = "" %}
+{% set pageName = "Need to sign in" %}
+
+
+{% block content %}
+
+    <section class="govuk-!-margin-bottom-0">
+        <div class="govuk-width-container">
+
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-two-thirds">
+
+                 
+
+                    <h1 class="govuk-heading-l">You need to be signed in to see this page</h1>
+                    <p class="govuk-body">You will need to <a href="sign-in">sign in</a>, and then try the link again.</p>
+                  
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

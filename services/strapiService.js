@@ -5,6 +5,7 @@ const axios = require('axios');
 const NodeCache = require('node-cache');
 const logger = require('../utils/logger');
 const { token } = require('morgan');
+const e = require('express');
 
 const STRAPI_API_URL = process.env.STRAPI_API_URL || 'http://localhost:1338';
 const STRAPI_API_KEY = process.env.STRAPI_API_KEY;
@@ -20,7 +21,6 @@ const strapiClient = axios.create({
 
 // Initialize cache (cache for 1 hour)
 const cache = new NodeCache({ stdTTL: cacheTimeout });
-
 
 
 const getUser = async (email) => {
@@ -130,6 +130,47 @@ const createUser = async (email) => {
     }
 };
 
+const createUserFull = async (firstName, lastName, email, jobRole) => {
+    if (!email || typeof email !== 'string') {
+        throw new Error("Invalid email: A valid string email must be provided.");
+    }
+
+    try {
+        // Adjust payload to match Strapi's expected structure
+        const payload = {
+            email: email, // Required field
+            firstName: firstName,
+            lastName: lastName,
+            jobRole: jobRole,
+            username: email, // Ensure this field matches your schema
+            password: Math.random().toString(36).substring(2, 12), // Default random password
+            confirmed: true, // Only if required by your API
+            blocked: false, // Only if required by your API
+            role: 1,
+            token: Math.random().toString(36).substring(2, 30)
+        };
+
+        const response = await strapiClient.post(`/api/users`, payload);
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Return the user data
+        return response.data;
+    } catch (error) {
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to create user with email: ${email}`, error.message);
+        throw new Error(`Error creating user: ${error.message}`);
+    }
+};
+
 const getUserByToken = async (token) => {
     if (!token || typeof token !== 'string') {
         throw new Error("Invalid token: A valid string token must be provided.");
@@ -196,6 +237,9 @@ const getStandardsOwnedByUser = async (userId) => {
     }
 
     try {
+
+        // get standards where the owners, contacts or creator 
+
         const response = await strapiClient.get(`/api/standards`, {
             params: {
                 populate: '*',
@@ -203,7 +247,7 @@ const getStandardsOwnedByUser = async (userId) => {
             },
         });
 
-        console.log(response.data.data);
+        // console.log(response.data.data);
 
         // Validate response structure
         if (!response || !response.data) {
@@ -226,12 +270,59 @@ const getStandardsOwnedByUser = async (userId) => {
     }
 };
 
+const getStandardsOwnedByUserDocumentId = async (userId) => {
+
+    try {
+
+        // get standards where the owners, contacts or creator 
+
+        console.log(userId);
+
+
+        const creatorResponse = await strapiClient.get(`/api/standards`, {
+            params: {
+                populate: 'stage',
+                status: 'Draft',
+                'filters[creator][documentId][$eq]': userId,
+                fields: 'id,title,documentId,firstPublished,version,updatedAt,standardId'
+            },
+        });
+
+        const ownersResponse = await strapiClient.get(`/api/standards`, {
+            params: {
+                populate: 'stage',
+                status: 'Draft',
+                'filters[owners][documentId][$contains]': userId,
+                fields: 'id,title,documentId,firstPublished,version,updatedAt,standardId'
+            },
+        });
+
+        console.log(creatorResponse.data.data);
+        console.log(ownersResponse.data.data);
+
+        const mergedData = [...creatorResponse.data.data, ...ownersResponse.data.data];
+
+        console.log(mergedData);
+
+        // Dedupe the array based on documentId
+        const uniqueData = mergedData.filter((v, i, a) => a.findIndex(t => (t.documentId === v.documentId)) === i);
+
+        console.log(uniqueData);
+     
+        return uniqueData
+    } catch (error) {
+
+        console.log(error.response.data.error);
+
+    }
+};
+
 const getStandardBySlug = async (slug) => {
     if (!slug || typeof slug !== 'string') {
         throw new Error("Invalid slug: A valid string slug must be provided.");
     }
 
-    console.log(slug)
+    // console.log(slug)
 
     try {
         const response = await strapiClient.get(`/api/standards`, {
@@ -254,19 +345,15 @@ const getStandardBySlug = async (slug) => {
     }
 };
 
-const getStandardById = async (id) => {
+const getStandardByDocumentId = async (documentId) => {
 
-    id = parseInt(id);
-
-    if (!id || typeof id !== 'number') {
-        throw new Error("Invalid number: A valid number must be provided.");
-    }
 
     try {
         const response = await strapiClient.get(`/api/standards`, {
             params: {
-                'filters[id][$eq]': id,
+                'filters[documentId][$eq]': documentId,
                 populate: '*',
+                status: 'Draft'
             },
         });
 
@@ -380,16 +467,16 @@ const createStandardDraft = async (userId, title) => {
             }
         };
 
-        console.log('Creating standard draft with payload:', createPayload);
+        // console.log('Creating standard draft with payload:', createPayload);
         const createResponse = await strapiClient.post(`/api/standards?status=draft`, createPayload);
-        console.log('Draft created successfully:', createResponse.data);
+        // console.log('Draft created successfully:', createResponse.data);
 
         if (!createResponse || !createResponse.data) {
             throw new Error("Unexpected response format from Strapi API during creation.");
         }
 
         const standardId = createResponse.data.data.id;
-        console.log(`Draft ID: ${standardId}`);
+        // console.log(`Draft ID: ${standardId}`);
 
         // Step 2: Update the standardId field
         const updatePayload = {
@@ -404,11 +491,11 @@ const createStandardDraft = async (userId, title) => {
 
         while (!success && attempt < maxRetries) {
             try {
-                console.log(`Attempt ${attempt + 1} to update standard ID: ${standardId}`);
+                // console.log(`Attempt ${attempt + 1} to update standard ID: ${standardId}`);
                 const updateResponse = await strapiClient.put(`/api/standards/${createResponse.data.data.documentId}?status=draft`, updatePayload);
 
                 if (updateResponse && updateResponse.data) {
-                    console.log('Standard ID updated successfully:', updateResponse.data);
+                    // console.log('Standard ID updated successfully:', updateResponse.data);
                     success = true;
                     return updateResponse.data.data;
                 }
@@ -490,7 +577,7 @@ const updateSummary = async (id, summary) => {
             throw new Error("Unexpected response format from Strapi API.");
         }
 
-        console.log(response.data);
+        // console.log(response.data);
 
         // Return the updated summary data
         return response.data.data;
@@ -619,7 +706,7 @@ const updateLegality = async (id, legality) => {
 
     legality = legality === 'yes' ? 1 : 0;
 
-    console.log(legality);
+    // console.log(legality);
 
     try {
 
@@ -630,7 +717,7 @@ const updateLegality = async (id, legality) => {
         };
 
         const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
-        
+
         // Validate response structure
         if (!response || !response.data) {
             throw new Error("Unexpected response format from Strapi API.");
@@ -663,7 +750,35 @@ const getStandardDraft = async (id, userId) => {
                 populate: '*',
                 'filters[creator][id][$eq]': userId,
                 status: 'Draft',
-                'filters[id][$eq]': id,
+                'filters[documentId][$eq]': id,
+            },
+        });
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Return the standard data
+
+        return response.data.data[0];
+    }
+    catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch standard with id: ${id}`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching standard: ${error.message}`);
+    }
+};
+
+const getPreview = async (documentId) => {
+    try {
+        const response = await strapiClient.get(`/api/standards`, {
+            params: {
+                populate: '*',
+                status: 'Draft',
+                'filters[documentId][$eq]': documentId,
             },
         });
 
@@ -869,7 +984,751 @@ const getCountStandards = async () => {
     }
 }
 
+const getCategories = async () => {
+
+    try {
+
+        const response = await strapiClient.get(`/api/categories`, {
+            params: {
+                'filters[active][$eq]': 1,
+                sort: 'title',
+            },
+        });
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // console.log(response.data.data);
+
+        // Ensure data is an array or handle empty results
+        return response.data.data;
+    }
+    catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch categories`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching categories: ${error.message}`);
+    }
+}
+
+
+
+const getSubCategories = async (categories) => {
+    try {
+
+        const response = await strapiClient.get(`/api/sub-categories`, {
+            params: {
+                'filters[active][$eq]': 1,
+                sort: 'title', populate: '*',
+            },
+        });
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // console.log(response.data.data);
+
+        // Ensure data is an array or handle empty results
+        return response.data.data;
+    }
+    catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch subcategories`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching subcategories: ${error.message}`);
+    }
+}
+
+const getProducts = async () => {
+    try {
+
+        const response = await strapiClient.get(`/api/products`, {
+            params: {
+                sort: 'title', populate: '*',
+                fields: 'documentId,title,vendor,version'
+            },
+        });
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // console.log(response.data.data);
+
+        // Ensure data is an array or handle empty results
+        return response.data.data;
+    }
+    catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch products`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching products: ${error.message}`);
+    }
+}
+
+
+
+// Update cateogories for a given standard
+// They will be a comma separated string of category ids which need to be converted to an array and linked to the standard based on the Id
+
+
+const updateCategories = async (id, selectedCategories) => {
+
+    try {
+
+        // console.log(selectedCategories);
+
+        const payload = {
+            data: {
+                categories: selectedCategories
+            }
+        };
+
+        const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Return the updated categories data
+        return response.data.data;
+
+    } catch (error) {
+
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to update categories with ID: ${selectedCategories.id}`, error.message);
+        throw new Error(`Error updating categories: ${error.message}`);
+    }
+}
+
+// Update the standard to set the approvedProducts to the selectedProduct if productType is 'Approved' and to set the toleratedProducts to the selectedProduct if productType is 'Tolerated'
+
+const updateProducts = async (id, selectedProduct, productType) => {
+
+    try {
+
+        let payload = {}
+
+        if (productType === 'Approved') {
+            payload = {
+                data: {
+                    approvedProducts: selectedProduct
+                }
+            };
+        }
+
+        if (productType === 'Tolerated') {
+            payload = {
+                data: {
+                    toleratedProducts: selectedProduct
+                }
+            };
+        }
+
+
+        const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Return the updated products data
+        return response.data.data;
+
+    } catch (error) {
+
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to update products with ID: ${selectedProduct.id}`, error.message);
+        throw new Error(`Error updating products: ${error.message}`);
+    }
+}
+
+// Remove the approved product  with the given documentId for the standards 
+// accepts standardDocumentId and productDocumentId
+// Get the current list, filter out the approvedProducts documentId and update the standard
+
+const removeApprovedProduct = async (standardDocumentId, productDocumentId) => {
+
+    try {
+
+        // console.log(standardDocumentId, productDocumentId);
+
+        const standard = await getStandardByDocumentId(standardDocumentId);
+
+        // console.log(standard);
+
+        const approvedProducts = standard.approvedProducts.filter(product => product.documentId !== productDocumentId);
+
+        const payload = {
+            data: {
+                approvedProducts: approvedProducts
+            }
+        };
+
+        const response = await strapiClient.put(`/api/standards/${standard.documentId}?status=draft`, payload);
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Return the updated products data
+        return response.data.data;
+
+    } catch (error) {
+
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to remove approved product with ID: ${productDocumentId}`, error.message);
+        throw new Error(`Error removing approved product: ${error.message}`);
+    }
+}
+
+const removeToleratedProduct = async (standardDocumentId, productDocumentId) => {
+
+    try {
+
+        // console.log(standardDocumentId, productDocumentId);
+
+        const standard = await getStandardByDocumentId(standardDocumentId);
+
+        // console.log(standard);
+
+        const toleratedProducts = standard.toleratedProducts.filter(product => product.documentId !== productDocumentId);
+
+        const payload = {
+            data: {
+                toleratedProducts: toleratedProducts
+            }
+        };
+
+        const response = await strapiClient.put(`/api/standards/${standard.documentId}?status=draft`, payload);
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Return the updated products data
+        return response.data.data;
+
+    } catch (error) {
+
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to remove tolerated product with ID: ${productDocumentId}`, error.message);
+        throw new Error(`Error removing tolerated product: ${error.message}`);
+    }
+}
+
+// updateValidity
+const updateValidity = async (id, validity) => {
+
+
+    try {
+
+        const payload = {
+            data: {
+                validityPeriod: validity
+            }
+        };
+
+        const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Return the updated validity data
+
+        return response.data.data;
+
+    } catch (error) {
+
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to update validity with ID: ${validity.id}`, error.message);
+        throw new Error(`Error updating validity: ${error.message}`);
+    }
+}
+
+// updateException
+// standard.documentId, exception, exceptiondetail
+// Create the exception in the exception type, get the exception documentId and update the standard.exceptions with the exception documentId
+const updateException = async (id, exception, exceptionDetail) => {
+    try {
+        // Step 1: Create the exception
+        const createPayload = {
+            data: {
+                title: exception,
+                details: exceptionDetail,
+                active: true, // Assuming 'active' is a valid field in your Exception model
+            },
+        };
+
+        const createResponse = await strapiClient.post(`/api/exceptions`, createPayload);
+
+        if (!createResponse || !createResponse.data) {
+            throw new Error("Unexpected response format from Strapi API during exception creation.");
+        }
+
+        const exceptionId = createResponse.data.data.documentId; // Use `id` from the response
+
+        if (!exceptionId) {
+            throw new Error("Failed to retrieve the exception ID from the response.");
+        }
+
+        // Step 2: Fetch the current standard
+        const standard = await getStandardByDocumentId(id);
+
+        if (!standard) {
+            throw new Error(`Standard with documentId "${id}" not found.`);
+        }
+
+        const { exceptions } = standard;
+
+        // Step 3: Append the new exception's ID
+        const updatedExceptions = [...exceptions.map((e) => e.documentId), exceptionId]; // Ensure we pass IDs only
+
+        // Step 4: Update the standard with the updated exceptions
+        const payload = {
+            data: {
+                exceptions: updatedExceptions, // Array of exception IDs
+            },
+        };
+
+        const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API during standard update.");
+        }
+
+        return response.data.data; // Return the updated standard
+    } catch (error) {
+        if (error.response) {
+            console.error("Strapi API Error:", error.response.data.error || error.response.data);
+        }
+        console.error(`Failed to update exception for standard with ID: ${id}`, error.message);
+        throw new Error(`Error updating exception: ${error.message}`);
+    }
+};
+
+const removeException = async (standardDocumentId, exceptionDocumentId) => {
+    try {
+        // console.log(standardDocumentId, exceptionDocumentId);
+
+        const standard = await getStandardByDocumentId(standardDocumentId);
+        // console.log(standard);
+
+        const exceptions = standard.exceptions
+            .filter(exception => exception.documentId !== exceptionDocumentId)
+            .map(exception => exception.documentId);
+
+
+        const payload = { data: { exceptions } };
+        // console.log(payload);
+
+        const response = await strapiClient.put(`/api/standards/${standard.documentId}?status=draft`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Then delete the exception in the exception type
+
+        const deleteResponse = await strapiClient.delete(`/api/exceptions/${exceptionDocumentId}`);
+
+        return response.data.data;
+    } catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response.data);
+        }
+        console.error(`Failed to remove exception with ID: ${exceptionDocumentId}`, error.message);
+        throw new Error(`Error removing exception: ${error.message}`);
+    }
+};
+
+// getPeople
+
+const getPeople = async () => {
+
+    try {
+
+        const response = await strapiClient.get(`/api/users`, {
+            params: {
+                sort: 'firstName',
+                'filters[confirmed][$eq]': 1,
+            },
+        });
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // Ensure data is an array or handle empty results
+        return response.data;
+    }
+
+    catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch people`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching people: ${error.message}`);
+    }
+}
+
+// updatePeople
+//standard.documentId, contactType, people, firstName, lastName, email, jobRole);
+
+const updatePeople = async (id, contactType, people, firstName, lastName, email, jobRole) => {
+
+    // if people exists, update the standard - if contactType === 'Owner' then update Owners, if contactType === 'Contact' then update Contacts     
+
+    try {
+        let payload = {}
+
+        if (people.length !== 0) {
+
+            // append Owners and Contacts to the standard
+
+            const standard = await getStandardByDocumentId(id);
+
+
+
+            if (contactType === 'Owner') {
+
+                const { owners } = standard;
+                const updatedOwners = [...owners.map((e) => e.documentId), people];
+
+                payload = {
+                    data: {
+                        owners: updatedOwners
+                    }
+                };
+            }
+
+            if (contactType === 'Contact') {
+
+                const { contacts } = standard;
+                const updatedContacts = [...contacts.map((e) => e.documentId), people];
+
+                payload = {
+                    data: {
+                        contacts: updatedContacts
+                    }
+                };
+            }
+
+            const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+
+        }
+
+        if (people.length === 0) {
+
+            //  Create a user and add them to the standard
+            const newUser = await createUserFull(firstName, lastName, email, jobRole);
+
+            if (contactType === 'Owner') {
+                payload = {
+                    data: {
+                        owners: [newUser]
+                    }
+                };
+            }
+
+            if (contactType === 'Contact') {
+                payload = {
+                    data: {
+                        contacts: [newUser]
+                    }
+                };
+            }
+
+            const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+        }
+    }
+
+    catch (error) {
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to update people with ID: ${people.id}`, error.message);
+        throw new Error(`Error updating people: ${error.message}`);
+
+    }
+}
+
+const removeOwner = async (standardDocumentId, ownerDocumentId) => {
+    try {
+        // console.log(standardDocumentId, exceptionDocumentId);
+
+        const standard = await getStandardByDocumentId(standardDocumentId);
+        // console.log(standard);
+
+        const owners = standard.owners
+            .filter(owner => owner.documentId !== ownerDocumentId)
+            .map(owner => owner.documentId);
+
+
+        const payload = { data: { owners } };
+        // console.log(payload);
+
+        const response = await strapiClient.put(`/api/standards/${standard.documentId}?status=draft`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+    } catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response.data);
+        }
+        console.error(`Failed to remove exception with ID: ${exceptionDocumentId}`, error.message);
+        throw new Error(`Error removing exception: ${error.message}`);
+    }
+};
+
+const removeContact = async (standardDocumentId, contactDocumentId) => {
+    try {
+        // console.log(standardDocumentId, exceptionDocumentId);
+
+        const standard = await getStandardByDocumentId(standardDocumentId);
+        // console.log(standard);
+
+        const contacts = standard.contacts
+            .filter(contact => contact.documentId !== contactDocumentId)
+            .map(contact => contact.documentId);
+
+
+        const payload = { data: { contacts } };
+        // console.log(payload);
+
+        const response = await strapiClient.put(`/api/standards/${standard.documentId}?status=draft`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+    } catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response.data);
+        }
+        console.error(`Failed to remove exception with ID: ${exceptionDocumentId}`, error.message);
+        throw new Error(`Error removing exception: ${error.message}`);
+    }
+};
+
+const getStageDocumentId = async (stage) => {
+
+    const payload = {
+        params: {
+            'filters[title][$eq]': stage,
+        },
+    };
+
+    const result = await strapiClient.get(`/api/stages`, payload);
+
+    if (!result || !result.data) {
+        throw new Error("Unexpected response format from Strapi API.");
+    }
+
+    return result.data.data[0].documentId;
+}
+
+
+
+const submitStandard = async (id) => {
+
+    try {
+
+        const stage = await getStageDocumentId('Approval');
+
+        const payload = {
+            data: {
+                stage: stage
+            }
+        };
+
+        console.log(stage)
+
+        const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+
+    }
+    catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        throw new Error(`Error submitting standard: ${error.message}`);
+    }
+}
+
+
+const updateSubCategories = async (id, selectedSubCategories) => {
+    
+    try {
+
+        console.log(selectedSubCategories);
+
+        const payload = {
+            data: {
+                sub_categories: selectedSubCategories
+            }
+        };
+
+        const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+
+    } catch (error) {
+
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        console.error(`Failed to update subcategories with ID: ${selectedSubCategories.id}`, error.message);
+        throw new Error(`Error updating subcategories: ${error.message}`);
+    }
+}
+
+const submitOutcome = async (documentId, outcome) => {
+    
+    try {
+
+        const stage = await getStageDocumentId(outcome);
+
+        const payload = {
+            data: {
+                stage: stage
+            }
+        };
+
+        const response = await strapiClient.put(`/api/standards/${documentId}?status=draft`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+
+    }
+    catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        throw new Error(`Error submitting standard: ${error.message}`);
+    }
+}
+
+
+const saveStandardComments = async (documentId, userId, outcome, comments) => {
+    try {
+
+        console.log(documentId, userId, outcome, comments);
+
+        const payload = {
+            data: {
+                standard: documentId,
+                user: userId,
+                title: 'Standard ' + outcome.toLowerCase(),
+                comments: comments,
+                dateCreated: new Date()
+            }
+        };
+
+        const response = await strapiClient.post(`/api/standard-comments`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+
+    }
+    catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        throw new Error(`Error saving comments: ${error.message}`);
+    }
+}
+
+const getStandardComments = async (documentId) => {
+    try {
+        const response = await strapiClient.get(`/api/standard-comments`, {
+            params: {
+                'filters[standard][documentId][$eq]': documentId,
+                sort: 'dateCreated:desc',
+                populate: {
+                    standard: true, // Populate the related `standard` entries
+                }
+            },
+        });
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+    } catch (error) {
+        console.error(`Failed to fetch comments for standard with documentId: ${documentId}`, error.message);
+        throw new Error(`Error fetching comments: ${error.message}`);
+    }
+};
+
 
 module.exports = {
-    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardById, updateGovernance, updateLegality
+    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments
 };

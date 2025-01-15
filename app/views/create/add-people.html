@@ -1,0 +1,156 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Create" %}
+{% set pageName = "Add person" %}
+{% set seoPageName = "" %}
+{% set pageDescription = ""%}
+
+{% set sidenav = 'people' %}
+{% set view = "standard" %}
+
+{% block hero %}
+    {% include './_head.html' %}
+{% endblock %}
+
+
+
+{% block content %}
+    <div class="govuk-width-container ">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-quarter">
+                {% include './_sidenav.html' %}
+            </div>
+            <div class="govuk-grid-column-three-quarters">
+                {% include './errorSummary.html' %}
+
+<div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+  <div class="govuk-notification-banner__header">
+    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+      Information
+    </h2>
+  </div>
+  <div class="govuk-notification-banner__content">
+    <p class="govuk-body">We know this page sucks, so choose to add an existing person, OR, add a new person. Don't select someone and add a new person. 
+    </p>
+  </div>
+</div>
+
+                <form action="/create/people/add" method="post">
+                    <h2 class="govuk-heading-l ">Add person</h2>
+
+                  
+
+                        <!-- Contact Type Selection -->
+                <div class="govuk-form-group {% if errors.contactType %}govuk-form-group--error{% endif %}">
+                    <fieldset class="govuk-fieldset" aria-describedby="contactType-hint">
+                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                <h2 class="govuk-fieldset__heading">
+       What type of contact are you adding
+      </h2>
+        </legend>
+                        {% if errors.contactType %}
+                            <span class="govuk-error-message">{{ errors.contactType }}</span>
+                        {% endif %}
+                        <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="contactType" name="contactType" type="radio" value="Owner" {% if formData.contactType == "Owner" %}checked{% endif %}>
+                                <label class="govuk-label govuk-radios__label" for="contactType">
+                                    Owner
+                                </label>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="contactType-2" name="contactType" type="radio" value="Contact" {% if formData.contactType == "General contact" %}checked{% endif %}>
+                                <label class="govuk-label govuk-radios__label" for="contactType-2">
+                                    Contact
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <!-- Existing People Selection -->
+                <div class="govuk-form-group {% if errors.people %}govuk-form-group--error{% endif %}">
+                 
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                <h2 class="govuk-fieldset__heading">
+       Search existing people
+      </h2>
+      </legend>
+                    {% if errors.people %}
+                        <span class="govuk-error-message">{{ errors.people }}</span>
+                    {% endif %}
+                    <select class="govuk-select govuk-!-width-one-half peoplelist" id="people" name="people">
+                        <option value=""></option>
+                        {% for person in people %}
+                            <option value="{{ person.documentId }}" {% if formBodu.people == person.documentId %}selected{% endif %}>{{ person.firstName }} {{ person.lastName }} ({{person.JobRole}})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <h2 class="govuk-heading-m">Or, add a new person</h2>
+
+                <p>If the person you want to add is not in the list, you can add a new contact.</p>
+                <p>If you add details of a new contact and have selected an existing person, the new contact details will be used, and the existing contact will be ignored.</p>
+
+
+                <!-- Contact Name -->
+                <div class="govuk-form-group {% if errors.firstName %}govuk-form-group--error{% endif %}">
+                    <label class="govuk-label" for="firstName">First name</label>
+                    {% if errors.firstName %}
+                        <span class="govuk-error-message">{{ errors.firstName }}</span>
+                    {% endif %}
+                    <input class="govuk-input {% if errors.firstName %}govuk-input--error{% endif %}" 
+                           id="firstName" name="firstName" type="text" value="{{ formBody.firstName | escape }}">
+                </div>
+
+                     <div class="govuk-form-group {% if errors.lastName %}govuk-form-group--error{% endif %}">
+                    <label class="govuk-label" for="lastName">Last name</label>
+                    {% if errors.lastName %}
+                        <span class="govuk-error-message">{{ errors.lastName }}</span>
+                    {% endif %}
+                    <input class="govuk-input {% if errors.lastName %}govuk-input--error{% endif %}" 
+                           id="lastName" name="lastName" type="text" value="{{ formBody.lastName | escape }}">
+                </div>
+
+                <!-- Contact Email -->
+                <div class="govuk-form-group {% if errors.email %}govuk-form-group--error{% endif %}">
+                    <label class="govuk-label" for="email">Email adderess</label>
+                    {% if errors.email %}
+                        <span class="govuk-error-message">{{ errors.email }}</span>
+                    {% endif %}
+                    <input class="govuk-input {% if errors.email %}govuk-input--error{% endif %}" 
+                           id="email" name="email" type="text" value="{{ formBody.email | escape }}">
+                </div>
+
+                    <!-- Job role -->
+                <div class="govuk-form-group {% if errors.jobRole %}govuk-form-group--error{% endif %}">
+                    <label class="govuk-label" for="email">Job role</label>
+                    {% if errors.jobRole %}
+                        <span class="govuk-error-message">{{ errors.jobRole }}</span>
+                    {% endif %}
+                    <input class="govuk-input {% if errors.jobRole %}govuk-input--error{% endif %}" 
+                           id="jobRole" name="jobRole" type="text" value="{{ formBody.jobRole | escape }}">
+                </div>
+
+
+                  
+
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Add person
+                    </button>
+                      <a class="govuk-link" href="/create/people">Cancel and return to owner and contacts</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        accessibleAutocomplete.enhanceSelectElement({defaultValue: '', selectElement: document.querySelector('.peoplelist')})
+    </script>
+{% endblock %}
