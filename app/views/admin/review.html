@@ -9,7 +9,7 @@
         <div class="govuk-width-container dfe-width-container ">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
-                      <a href="/admin" class="govuk-back-link">Back</a>
+                    <a href="/admin" class="govuk-back-link">Back</a>
                     <h1 class="govuk-heading-xl govuk-!-padding-top-0 govuk-!-padding-bottom-0">{{pageName}}</h1>
                     <nav class="app-sub-navigation" aria-label="Application menu">
                         <ul class="app-sub-navigation__list">
@@ -33,30 +33,36 @@
     <div class="govuk-width-container">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-             
-                <table class="govuk-table">
-                    <thead class="govuk-table__head">
-                        <tr class="govuk-table__row">
-                            <th class="govuk-table__header" scope="col">Title</th>
-                            <th class="govuk-table__header" scope="col">Reference</th>
-                            <th class="govuk-table__header" scope="col">Version</th>
-                            <th class="govuk-table__header" scope="col">Submitted</th>
-                            <th class="govuk-table__header" scope="col">Submitted by</th>
-                        </tr>
-                    </thead>
-                    <tbody class="govuk-table__body">
-                        {% for standard in standards %}
+                {% if standards.length %}
+                    <table class="govuk-table">
+                        <thead class="govuk-table__head">
                             <tr class="govuk-table__row">
-                                <td class="govuk-table__cell"><a href="/admin/standard/{{standard.documentId}}" class="govuk-link">{{standard.title}}</a></td>
-                                <td class="govuk-table__cell">DDTS-{{standard.standardId}}</td>
-                                <td class="govuk-table__cell">v.{{standard.version}}</td>
-                                <td class="govuk-table__cell">{{standard.submitted | date('D MMM YYYY')}}</td>
-                                <td class="govuk-table__cell">{{standard.creator.firstName}} {{standard.creator.lastName}}</td>
+                                <th class="govuk-table__header" scope="col">Title</th>
+                                <th class="govuk-table__header" scope="col">Reference</th>
+                                <th class="govuk-table__header" scope="col">Version</th>
+                                <th class="govuk-table__header" scope="col">Submitted</th>
+                                <th class="govuk-table__header" scope="col">Submitted by</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                            {% for standard in standards %}
+                                <tr class="govuk-table__row">
+                                    <td class="govuk-table__cell">
+                                        <a href="/admin/standard/{{standard.documentId}}" class="govuk-link">{{standard.title}}</a>
+                                    </td>
+                                    <td class="govuk-table__cell">DDTS-{{standard.standardId}}</td>
+                                    <td class="govuk-table__cell">v.{{standard.version}}</td>
+                                    <td class="govuk-table__cell">{{standard.submitted | date('D MMM YYYY')}}</td>
+                                    <td class="govuk-table__cell">{{standard.creator.firstName}}
+                                        {{standard.creator.lastName}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
 
+                {% else %}
+                    <p class="govuk-body">There are no standards to review.</p>
+                {% endif %}
             </div>
         </div>
     </div>

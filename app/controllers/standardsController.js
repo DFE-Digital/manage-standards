@@ -1,4 +1,7 @@
+const { validationResult } = require('express-validator');
 const strapiService = require('../../services/strapiService');
+const validation = require('../validation/createValidation');
+const notifyService = require('../../services/notifyService.js');
 
 exports.g_standards = async (req, res, next) => {
 
@@ -89,7 +92,12 @@ exports.g_standard_manage = async (req, res, next) => {
     try {
         const { documentId } = req.params;
 
+        req.session.Standard = {};
+
         const standard = await strapiService.getStandardByDocumentId(documentId);
+
+        console.log('Get manage')
+        console.log(standard);
 
         if (standard.stage.title === 'Draft') {
             return res.redirect(`/create/getdraft/${documentId}`);
@@ -158,18 +166,24 @@ exports.p_publish_standard = async (req, res, next) => {
     try {
         const { documentId } = req.body;
 
+        const oldStandard = await strapiService.getStandardByDocumentId(documentId);
+
         const standard = await strapiService.publishStandard(documentId);
 
-        // Audit
-        const auditPayload = {
+        await strapiService.createAuditLog({
             data: {
-                title: 'Stage change'
-            }
-        };
+                title: 'Standard published',
+                entity: 'Standard',
+                entityId: oldStandard.documentId,
+                user: req.session.User.documentId,
+                auditDate: new Date(),
+                details: 'standards.p_publish_standard',
+                oldValue: oldStandard.stage.title,
+                newValue: 'Published',
+            },
+        });
 
-        strapiService.createAuditLog(auditPayload);
-
-        return res.redirect(`/standards/standard/${documentId}`);
+        return res.redirect(`/standards/standard/manage/${documentId}`);
     } catch (error) {
         console.error('Error publishing standard:', error);
         res.status(500).render('error', {
@@ -178,3 +192,38 @@ exports.p_publish_standard = async (req, res, next) => {
         });
     }
 }
+
+
+
+// Editors
+exports.p_edit_summary = [
+    validation.validateSummary,
+    async (req, res) => {
+        const errors = validationResult(req);
+        const { documentId, summary } = req.body;
+
+        const standard = await strapiService.getStandardByDocumentId(documentId);
+
+        if (!errors.isEmpty()) {
+            return res.render('standards/standard/manage', {
+                standard: standard,
+                errors: errors.array(),
+                summary,
+                mode: 'edit', section: 'summary' 
+            });
+        }
+
+        try {
+            const updatedStandard = await strapiService.updateSummary(documentId, summary);
+
+            console.log('edit summary manage')
+console.log(updatedStandard)
+
+            req.session.Standard = updatedStandard;
+            return res.redirect('/standards/standard/manage/' + standard.documentId);
+        } catch (error) {
+            console.error('Error updating summary:', error);
+            //return renderErrorPage(res, 'Failed to update summary. Please try again later.');
+        }
+    }
+];

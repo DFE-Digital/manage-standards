@@ -73,6 +73,9 @@ router.get('/standard/:slug/history', isAuthenticated, standardsController.g_sta
 
 router.post('/standards/standard/publish', isAuthenticated, standardsController.p_publish_standard);
 
+//Editors
+router.post('/standard/editor/summary', isAuthenticated, standardsController.p_edit_summary);
+
 // Create routes
 router.get('/create', isAuthenticated, createController.g_start);
 router.get('/create/getdraft/:documentId', isAuthenticated, createController.g_getdraft);

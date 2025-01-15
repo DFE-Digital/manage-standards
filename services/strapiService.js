@@ -358,6 +358,7 @@ const getStandardByDocumentId = async (documentId) => {
         });
 
 
+
         // Return the standard data
         return response.data.data[0]; // Assuming slug is unique and returning the first match
     } catch (error) {
@@ -1738,13 +1739,14 @@ const publishStandard = async (documentId) => {
         const payload = {
             data: {
                 stage: stage,
-                firstPublishedAt: new Date(),
+                firstPublished: new Date(),
+                lastUpdated: new Date(),
                 version: 1,
                 previousVersion: currentStandard.version
             }
         };
 
-        const response = await strapiClient.put(`/api/standards/${documentId}?status=draft`, payload);
+        const response = await strapiClient.put(`/api/standards/${documentId}`, payload);
 
         if (!response || !response.data) {
             throw new Error("Unexpected response format from Strapi API.");

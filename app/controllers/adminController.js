@@ -159,10 +159,10 @@ exports.p_add_admin = [
 exports.p_remove_admin = async (req, res, next) => {
 
     try {
-
         const { id } = req.body;
-
         await strapiService.removeAdmin(id);
+
+        // ToDo - Display a success message on the admins page when removed.
 
         res.redirect('/admin/admins');
     } catch (error) {
@@ -174,7 +174,6 @@ exports.p_remove_admin = async (req, res, next) => {
     }
 }
 
-//p_submit_outcome
 
 exports.p_submit_outcome = [
     validation.validateApproval,
@@ -202,6 +201,19 @@ exports.p_submit_outcome = [
             // send notify email
             if (outcome === 'Approved') {
 
+                await strapiService.createAuditLog({
+                    data: {
+                        title: 'Standard review outcome',
+                        entity: 'Standard',
+                        entityId: standard.documentId,
+                        user: req.session.User.documentId,
+                        auditDate: new Date(),
+                        details: 'admin.p_submit_outcome',
+                        oldValue: standard.stage.title,
+                        newValue: 'Approved',
+                    },
+                });
+
                 const publishersList = [];
                 publishersList.push(standard.creator.email);
 
@@ -224,6 +236,19 @@ exports.p_submit_outcome = [
             }
 
             if (outcome === 'Rejected') {
+
+                await strapiService.createAuditLog({
+                    data: {
+                        title: 'Standard review outcome',
+                        entity: 'Standard',
+                        entityId: standard.documentId,
+                        user: req.session.User.documentId,
+                        auditDate: new Date(),
+                        details: 'admin.p_submit_outcome',
+                        oldValue: standard.stage.title,
+                        newValue: 'Rejected',
+                    },
+                });
 
                 const publishersList = [];
                 publishersList.push(standard.creator.email);

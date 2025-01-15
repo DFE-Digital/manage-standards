@@ -100,7 +100,7 @@ exports.g_summary = async (req, res, next) => {
             return res.redirect('/create');
         }
 
-        const standard = req.session.Standard
+        const standard = await strapiService.getStandardDraft(req.session.Standard.documentId, req.session.User.id);
 
         return res.render('create/summary', { standard });
     } catch (error) {
@@ -553,7 +553,7 @@ exports.p_title = [
                     },
                 });
 
-                req.session.Standard = updatedStandard; // Update the session with the new object
+                req.session.Standard = updatedStandard;
 
 
             } else {
@@ -600,6 +600,19 @@ exports.p_submit = async (req, res, next) => {
                 serviceURL: process.env.serviceURL,
                 standardId: standard.documentId,
             };
+
+            await strapiService.createAuditLog({
+                data: {
+                    title: 'Standard submitted',
+                    entity: 'Standard',
+                    entityId: standard.documentId,
+                    user: req.session.User.documentId ,
+                    auditDate: new Date(),
+                    details: 'create.p_submit',
+                    oldValue: 'Draft',
+                    newValue: 'Approval',
+                },
+            });
 
             if (standard.owners && standard.owners.length > 0) {
 

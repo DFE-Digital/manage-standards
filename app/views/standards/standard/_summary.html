@@ -13,7 +13,9 @@
     <div class="govuk-summary-card__content">
         {% include './errorSummary.html' %}
 
-        <form action="/create/summary" method="post">
+        <form action="/standard/editor/summary" method="post">
+            <input type="hidden" name="documentId" value="{{ standard.documentId }}">
+            
             <div class="govuk-form-group govuk-character-count {% if errors %} govuk-form-group--error{% endif %}" data-module="govuk-character-count" data-maxlength="200">
                 <h2 class="govuk-label-wrapper">
                     <label class="govuk-label govuk-label--l" for="summary-hint">
