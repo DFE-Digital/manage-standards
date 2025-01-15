@@ -46,9 +46,13 @@
                     </div>
                     <div class="govuk-notification-banner__content">
                         <p class="govuk-notification-banner__heading">This standard can be published.</p>
-                        <form method="post" action="/standards/standard/publish/{{ standard.documentId }}">
+
+                        <p class="govuk-body">The standard has been approved for publication by the standards forum.</p>
+                        <p class="govuk-body">When you publish the standard, it will become available in the Standards manual immediately.</p>
+                        <form method="post" action="/standards/standard/publish">
+                        <input type="hidden" name="documentId" value="{{ standard.documentId }}">
                             <div class="govuk-button-group">
-                                <button type="submit" class="govuk-button" name="action" value="publish">Publish</button>
+                                <button type="submit" class="govuk-button govuk-!-margin-bottom-0" name="action" value="publish">Publish</button>
                             </div>
                         </form>
 
@@ -65,7 +69,10 @@
                     </div>
                     <div class="govuk-notification-banner__content">
                         <p class="govuk-notification-banner__heading">This standard can't be published and you need to make some changes.</p>
-                        <form method="post" action="/standards/standard/revert/{{ standard.documentId }}">
+                        <p>You should <a href="/standards/standard/manage/{{standard.documentId}}#reviewhistory">review the comments</a> from the standards forum and make the necessary changes.</p>
+
+                        <form method="post" action="/standards/standard/revert">
+                        <input type="hidden" name="documentId" value="{{ standard.documentId }}">
                             <div class="govuk-button-group">
                                 <button type="submit" class="govuk-button">Revert to draft</button>
                             </div>
@@ -84,14 +91,10 @@
                     </div>
                     <div class="govuk-notification-banner__content">
                         <p class="govuk-notification-banner__heading">This standard is published.</p>
-                        <p class="govuk-body">To make changes you will need to create a new draft version.</p>
+                        <p class="govuk-body">You can make changes to content, owners, and contacts, without getting reapproval from the standards forum.</p>
+                        <p class="govuk-body">Changes to approved and tolerated products will require the standard to go back through the approval process.</p>
 
-                        <form method="post" action="/standards/standard/revert/{{ standard.documentId }}">
-                            <div class="govuk-button-group">
-                                <button type="submit" class="govuk-button">Revert to draft</button>
-                            </div>
-                        </form>
-
+                        <p class="govuk-body">You can read guidance for <a href="">making changes to published standards</a> for more information.</p>
                     </div>
                 </div>
 

@@ -26,6 +26,29 @@ const pool = new pg.Pool({
 });
 
 
+// async function ensureSessionTable() {
+//     const createTableQuery = `
+//         CREATE TABLE IF NOT EXISTS sessions (
+//             sid VARCHAR NOT NULL PRIMARY KEY,
+//             sess JSON NOT NULL,
+//             expire TIMESTAMP(6) NOT NULL
+//         );
+//         CREATE INDEX IF NOT EXISTS idx_sessions_expire ON sessions (expire);
+//     `;
+
+//     try {
+//         const client = await pool.connect();
+//         await client.query(createTableQuery);
+//         client.release();
+//         console.log("Sessions table ensured in database.");
+//     } catch (error) {
+//         console.error("Error ensuring sessions table:", error);
+//     }
+// }
+
+// // Call this function before setting up your session middleware
+// ensureSessionTable();
+
 
 app.use(session({
     store: new pgSession({

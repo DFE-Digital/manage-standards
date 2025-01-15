@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 const strapiService = require('../../services/strapiService');
 const validation = require('../validation/createValidation');
-const e = require('express');
+const notifyService = require('../../services/notifyService.js');
 
 // Helper function to handle error pages consistently
 function renderErrorPage(res, message = 'Failed to load page. Please try again later.', title = 'Error', status = 500) {
@@ -539,11 +539,41 @@ exports.p_title = [
             if (standard.documentId) {
                 // If the standard exists, update the title
                 const updatedStandard = await strapiService.updateTitle(standard.documentId, title);
+
+                await strapiService.createAuditLog({
+                    data: {
+                        title: 'Standard updated',
+                        entity: 'Standard',
+                        entityId: standard.documentId,
+                        user: user.documentId,
+                        auditDate: new Date(),
+                        details: 'create.p_title',
+                        oldValue: standard.title,
+                        newValue: title,
+                    },
+                });
+
                 req.session.Standard = updatedStandard; // Update the session with the new object
+
+
             } else {
                 // If no standard exists, create a new one
                 const newStandard = await strapiService.createStandardDraft(user.id, title);
+                await strapiService.createAuditLog({
+                    data: {
+                        title: 'Standard created',
+                        entity: 'Standard',
+                        entityId: newStandard.documentId,
+                        user: req.session.User.documentId,
+                        auditDate: new Date(),
+                        details: 'create.p_title',
+                        oldValue: '',
+                        newValue: 'Draft'
+                    },
+                });
+
                 req.session.Standard = newStandard; // Store the newly created standard
+
             }
 
             return res.redirect('/create/summary');
@@ -562,12 +592,38 @@ exports.p_submit = async (req, res, next) => {
         }
 
         const { action } = req.body;
-        const standard = req.session.Standard
+        const standard = await strapiService.getStandardDraft(req.session.Standard.documentId, req.session.User.id);
 
         if (action === 'Submit') {
-            // Set status to "Approval"
+            const templateParams = {
+                standardName: standard.title,
+                serviceURL: process.env.serviceURL,
+                standardId: standard.documentId,
+            };
+
+            if (standard.owners && standard.owners.length > 0) {
+
+                const publishersList = [];
+                publishersList.push(standard.creator.email);
+
+                standard.owners.forEach(owner => {
+                    publishersList.push(owner.email);
+                });
+
+                const uniquePublishersList = [...new Set(publishersList)];
+
+                uniquePublishersList.forEach(email => {
+                    notifyService.sendNotifyEmail(process.env.EMAIL_STANDARD_SUBMITTED, email, templateParams);
+                });
+            }
+
+            // Notify the forum (EMAIL_STANDARD_SUBMITTED_TO_FORUM and EMAIL_FORUM)
+            notifyService.sendNotifyEmail(process.env.EMAIL_STANDARD_SUBMITTED, process.env.EMAIL_FORUM, templateParams);
+
             await strapiService.submitStandard(standard.documentId);
+
             return res.redirect('/create/complete');
+
         }
 
         if (action === 'Delete') {

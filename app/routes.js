@@ -67,12 +67,11 @@ router.get('/standards', isAuthenticated, standardsController.g_standards);
 router.get('/standards/standard/:documentId', isAuthenticated, standardsController.g_standard);
 router.get('/standards/standard/manage/:documentId', isAuthenticated, standardsController.g_standard_manage);
 router.get('/standards/standard/history/:documentId', isAuthenticated, standardsController.g_standard_history);
-
 router.get('/standards/standard/edit-section/:section/:documentId', isAuthenticated, standardsController.g_standard_edit_section);
-
 router.get('/standard/:slug', isAuthenticated, standardsController.g_standardBySlug);
 router.get('/standard/:slug/history', isAuthenticated, standardsController.g_standardHistoryBySlug);
 
+router.post('/standards/standard/publish', isAuthenticated, standardsController.p_publish_standard);
 
 // Create routes
 router.get('/create', isAuthenticated, createController.g_start);

@@ -2,6 +2,7 @@ const strapiService = require('../../services/strapiService');
 const { validationResult } = require('express-validator');
 const { validateAddAdmin } = require('../validation/authValidation');
 const validation = require('../validation/createValidation');
+const notifyService = require('../../services/notifyService.js');
 
 exports.g_admin = async (req, res, next) => {
 
@@ -56,12 +57,19 @@ exports.g_standards = async (req, res, next) => {
 }
 
 exports.g_standard = async (req, res, next) => {
-
     try {
+        // Fetch the standard by documentId
         const standard = await strapiService.getStandardByDocumentId(req.params.documentId);
-        const reviewhistory = await strapiService.getStandardComments(req.params.documentId);
 
-        return res.render('admin/standard/index', { standard, reviewhistory });
+        // Extract and sort the standard_comments
+        const standardComments = standard.standard_comments || [];
+        const sortedStandardComments = standardComments.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
+
+        // Pass the standard and sorted comments to the view
+        return res.render('admin/standard/index', {
+            standard,
+            sortedStandardComments
+        });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).render('error', {
@@ -69,7 +77,7 @@ exports.g_standard = async (req, res, next) => {
             message: 'Failed to load dashboard. Please try again later.'
         });
     }
-}
+};
 
 exports.g_standard_outcome = async (req, res, next) => {
     try {
@@ -175,7 +183,7 @@ exports.p_submit_outcome = [
         try {
 
             const { documentId, outcome, comments } = req.body;
-            const standard = await strapiService.getStandardByDocumentId(req.params.documentId);
+            const standard = await strapiService.getStandardByDocumentId(documentId);
             const errors = validationResult(req);
 
             console.log(documentId)
@@ -191,7 +199,54 @@ exports.p_submit_outcome = [
 
             await strapiService.saveStandardComments(documentId, req.session.User.documentId, outcome, comments);
 
-            return res.redirect('/admin/standard/' + documentId);   
+            // send notify email
+            if (outcome === 'Approved') {
+
+                const publishersList = [];
+                publishersList.push(standard.creator.email);
+
+                standard.owners.forEach(owner => {
+                    publishersList.push(owner.email);
+                });
+
+                const uniquePublishersList = [...new Set(publishersList)];
+
+                const templateParams = {
+                    standardName: standard.title,
+                    serviceURL: process.env.serviceURL,
+                    standardId: standard.documentId,
+                    comments: comments ?? 'No additional comments provided'
+                };
+
+                uniquePublishersList.forEach(email => {
+                    notifyService.sendNotifyEmail(process.env.EMAIL_FORUM_APPROVED_TEMPLATE_ID, email, templateParams);
+                });
+            }
+
+            if (outcome === 'Rejected') {
+
+                const publishersList = [];
+                publishersList.push(standard.creator.email);
+
+                standard.owners.forEach(owner => {
+                    publishersList.push(owner.email);
+                });
+
+                const uniquePublishersList = [...new Set(publishersList)];
+
+                const templateParams = {
+                    standardName: standard.title,
+                    serviceURL: process.env.serviceURL,
+                    standardId: standard.documentId,
+                    reason: comments ?? 'No reason provided'
+                };
+
+                uniquePublishersList.forEach(email => {
+                    notifyService.sendNotifyEmail(process.env.EMAIL_FORUM_REJECTED_TEMPLATE_ID, email, templateParams);
+                });
+            }
+
+            return res.redirect('/admin/standard/' + documentId);
         } catch (error) {
             console.error('Error submitting outcome:', error);
             res.status(500).render('error', {

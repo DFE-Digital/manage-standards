@@ -5,9 +5,9 @@ exports.g_standards = async (req, res, next) => {
     try {
         const user = req.session.User;
 
-        const standards = await strapiService.getStandardsOwnedByUserDocumentId (user.documentId);
+        const standards = await strapiService.getStandardsOwnedByUserDocumentId(user.documentId);
 
-        return  res.render('standards/index', { standards });
+        return res.render('standards/index', { standards });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).render('error', {
@@ -19,7 +19,7 @@ exports.g_standards = async (req, res, next) => {
 
 exports.g_standardBySlug = async (req, res, next) => {
     try {
-        const {slug} = req.params;
+        const { slug } = req.params;
 
         const standard = await strapiService.getStandardBySlug(slug);
 
@@ -32,7 +32,7 @@ exports.g_standardBySlug = async (req, res, next) => {
             });
         }
 
-        return res.render('standards/standard', { standard});
+        return res.render('standards/standard', { standard });
     } catch (error) {
         console.log('Error fetching standard:', error);
     }
@@ -60,14 +60,13 @@ exports.g_standardHistoryBySlug = async (req, res, next) => {
 }
 
 exports.g_standard = async (req, res, next) => {
-    
+
     try {
         const { documentId } = req.params;
 
         const standard = await strapiService.getStandardByDocumentId(documentId);
 
-        if(standard.stage.title === 'Draft')
-        {
+        if (standard.stage.title === 'Draft') {
             return res.redirect(`/create/getdraft/${documentId}`);
         }
         if (standard.stage.title === 'Published') {
@@ -75,7 +74,7 @@ exports.g_standard = async (req, res, next) => {
         }
 
 
-       return  res.render('standards/standard/manage', { standard });
+        return res.render('standards/standard/manage', { standard });
     } catch (error) {
         console.error('Error fetching standard:', error);
         res.status(500).render('error', {
@@ -138,7 +137,7 @@ exports.g_standard_edit_section = async (req, res, next) => {
             return res.redirect(`/create/getdraft/${documentId}`);
         }
 
-        if(section === 'summary'){
+        if (section === 'summary') {
             return res.render('standards/standard/manage', { standard, mode: 'edit', section: 'summary' });
         }
 
@@ -148,6 +147,34 @@ exports.g_standard_edit_section = async (req, res, next) => {
         res.status(500).render('error', {
             title: 'Error',
             message: 'Failed to load standard. Please try again later.'
+        });
+    }
+}
+
+// POSTS
+
+exports.p_publish_standard = async (req, res, next) => {
+
+    try {
+        const { documentId } = req.body;
+
+        const standard = await strapiService.publishStandard(documentId);
+
+        // Audit
+        const auditPayload = {
+            data: {
+                title: 'Stage change'
+            }
+        };
+
+        strapiService.createAuditLog(auditPayload);
+
+        return res.redirect(`/standards/standard/${documentId}`);
+    } catch (error) {
+        console.error('Error publishing standard:', error);
+        res.status(500).render('error', {
+            title: 'Error',
+            message: 'Failed to publish standard. Please try again later.'
         });
     }
 }

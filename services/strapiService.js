@@ -362,7 +362,7 @@ const getStandardByDocumentId = async (documentId) => {
         return response.data.data[0]; // Assuming slug is unique and returning the first match
     } catch (error) {
         // Log the error with additional context
-        console.error(`Failed to fetch standard with id: ${id}`, error.message);
+        console.error(`Failed to fetch standard with id: ${documentId}`, error.message);
 
         // Rethrow the error with a meaningful message
         throw new Error(`Error fetching standard: ${error.message}`);
@@ -1728,7 +1728,66 @@ const getStandardComments = async (documentId) => {
     }
 };
 
+const publishStandard = async (documentId) => {
+    try {
+
+        const currentStandard = await getStandardByDocumentId(documentId);
+
+        const stage = await getStageDocumentId('Published');
+
+        const payload = {
+            data: {
+                stage: stage,
+                firstPublishedAt: new Date(),
+                version: 1,
+                previousVersion: currentStandard.version
+            }
+        };
+
+        const response = await strapiClient.put(`/api/standards/${documentId}?status=draft`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+    } catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        throw new Error(`Error publishing standard: ${error.message}`);
+    }
+}
+const createAuditLog = async (payload) => {
+    try {
+        if (!payload || !payload.data || typeof payload.data !== 'object') {
+            throw new Error('Invalid payload format. Expected an object with a "data" property.');
+        }
+        
+        const response = await strapiClient.post('/api/audits', payload);
+
+        // Check response structure
+        if (!response || !response.data) {
+            throw new Error('Unexpected response format from Strapi API.');
+        }
+    } catch (error) {
+        // Log error details
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error || 'No additional error details.');
+        } else {
+            console.error('Unexpected Error:', error.message);
+        }
+
+        // Re-throw error for upstream handling
+        throw new Error(`Error creating audit log: ${error.message}`);
+    }
+};
+
+
+
+
 
 module.exports = {
-    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments
+    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog
 };
