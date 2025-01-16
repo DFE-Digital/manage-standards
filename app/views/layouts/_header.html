@@ -1,6 +1,6 @@
-  {% if user.Administrator === true %}
+{% if user.Administrator === true %}
 
-{{ header({
+  {{ header({
   "showNav": "true",
   "showSearch": "false",
   "showHeaderActionLinks": "true",
@@ -36,15 +36,16 @@
     {
       "url": "/admin",
       "label": "Admin"
-    }
+    },
+{
+"url" : "/guidance",
+"label" : "Guidance"
+}
   ]
 }) }}
 
-
-
-
 {% else %}
-{{ header({
+  {{ header({
   "showNav": "true",
   "showSearch": "false",
   "showHeaderActionLinks": "true",
@@ -76,9 +77,11 @@
     {
       "url": "/compliance",
       "label": "Compliance"
-    }
+    },
+{
+"url" : "/guidance",
+"label" : "Guidance"
+}
   ]
 }) }}
 {% endif %}
-
-

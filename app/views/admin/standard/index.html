@@ -279,77 +279,76 @@
                     <p class="govuk-body">There have been no previous reviews for this standard.</p>
                 {% endif %}
                 <h2 id="outcome" class="govuk-heading-l govuk-!-margin-top-5">Outcome</h2>
-                <p>When reviewing the standard, you must:</p>
+                <p>When reviewing, you must ensure the standard:</p>
                 <ul class="govuk-list govuk-list--bullet">
-                    <li>ensure the standard can be applied in a binary way</li>
-                    <li>ensure the standard is clear and unambiguous</li>
-                    <li>ensure the standard is written using plain language and any acronyms, initialisms, and abbreviations are written out in full</li>
-                    <li>check that there is no commercially sensitive or secret information included which could damage department reputation or put the department at risk</li>
-                    <li>check that the standard is not a duplicate of another standard</li>
+                    <li>is complete</li>
+                    <li>can be applied in a binary way</li>
+                    <li>is clear and unambiguous</li>
+                    <li>is written using plain language and any acronyms, initialisms, and abbreviations are written out in full</li>
+                    <li>contains no commercially sensitive or secret information, which could damage department reputation or put the department at risk</li>
+                    <li>is not a duplicate of another standard</li>
                 </ul>
-
-        </ul>
-        <div class="govuk-summary-card  govuk-!-margin-top-9">
-            <div class="govuk-summary-card__title-wrapper">
-                <h2 class="govuk-summary-card__title">Standard forum outcome</h2>
-            </div>
-            <div class="govuk-summary-card__content govuk-!-padding-top-5">
-                <form method="post" action="/admin/standard/outcome" method="post">
-                    <input type="hidden" name="documentId" value="{{standard.documentId}}">
-                    <div class="govuk-form-group">
-                        <fieldset class="govuk-fieldset" aria-describedby="outcome-hint">
-                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">What is the standard forum outcome?</legend>
-                            <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
-                                <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="outcome" name="outcome" type="radio" value="Approved">
-                                    <label class="govuk-label govuk-radios__label" for="outcome">
+                <div class="govuk-summary-card  govuk-!-margin-top-9">
+                    <div class="govuk-summary-card__title-wrapper">
+                        <h2 class="govuk-summary-card__title">Standard forum outcome</h2>
+                    </div>
+                    <div class="govuk-summary-card__content govuk-!-padding-top-5">
+                        <form method="post" action="/admin/standard/outcome" method="post">
+                            <input type="hidden" name="documentId" value="{{standard.documentId}}">
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset" aria-describedby="outcome-hint">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">What is the standard forum outcome?</legend>
+                                    <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                                        <div class="govuk-radios__item">
+                                            <input class="govuk-radios__input" id="outcome" name="outcome" type="radio" value="Approved">
+                                            <label class="govuk-label govuk-radios__label" for="outcome">
                               Approve
                               </label>
-                                </div>
-                                <div class="govuk-radios__item">
-                                    <input class="govuk-radios__input" id="outcome-2" name="outcome" type="radio" value="Rejected">
-                                    <label class="govuk-label govuk-radios__label" for="outcome-2">
+                                        </div>
+                                        <div class="govuk-radios__item">
+                                            <input class="govuk-radios__input" id="outcome-2" name="outcome" type="radio" value="Rejected">
+                                            <label class="govuk-label govuk-radios__label" for="outcome-2">
                               Reject
                               </label>
-                                </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
                             </div>
-                        </fieldset>
-                    </div>
-                    <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="1000">
-                        <label class="govuk-label govuk-label--m" for="comments">
+                            <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="1000">
+                                <label class="govuk-label govuk-label--m" for="comments">
                      Forum outcome comments
                      </label>
-                        <div id="comments-hint" class="govuk-hint">
+                                <div id="comments-hint" class="govuk-hint">
                         Optional comments which will go back to the standard owners and submittor.
                      </div>
-                        <textarea class="govuk-textarea govuk-js-character-count" id="comments" name="comments" rows="5" aria-describedby="comments-info comments-hint"></textarea>
-                        <div id="comments-info" class="govuk-hint govuk-character-count__message">
+                                <textarea class="govuk-textarea govuk-js-character-count" id="comments" name="comments" rows="5" aria-describedby="comments-info comments-hint"></textarea>
+                                <div id="comments-info" class="govuk-hint govuk-character-count__message">
                         You can enter up to 1,000 characters
                      </div>
-                    </div>
-                    <button type="submit" class="govuk-button" data-module="govuk-button">
+                            </div>
+                            <button type="submit" class="govuk-button" data-module="govuk-button">
                   Submit outcome
                   </button>
-                </form>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-</div>
-<style>
-@media (min-width: 768px) {
-    /* Apply sticky for larger screens */
-    .sticky {
-        position: sticky;
-        top: 20px;
-        z-index: 10;
-    }
-}
-@media (max-width: 767px) {
-    /* For smaller devices, default behavior */
-    .sticky {
-        position: relative;
-    }
-}
-</style>
+    <style>
+        @media (min-width: 768px) {
+            /* Apply sticky for larger screens */
+            .sticky {
+                position: sticky;
+                top: 20px;
+                z-index: 10;
+            }
+        }
+        @media (max-width: 767px) {
+            /* For smaller devices, default behavior */
+            .sticky {
+                position: relative;
+            }
+        }
+    </style>
 {% endblock %}
