@@ -6,6 +6,7 @@ const app = express();
 const homeController = require('./controllers/homeController.js');
 const authController = require('./controllers/authController.js');
 const complianceController = require('./controllers/complianceController.js');
+const guidanceController = require('./controllers/guidanceController.js');
 const profileController = require('./controllers/profileController.js');
 const dashboardController = require('./controllers/dashboardController.js');
 const standardsController = require('./controllers/standardsController.js');
@@ -48,6 +49,11 @@ function isAdmin(req, res, next) {
 
 // Home routes
 router.get('/', isAuthenticated, homeController.g_homepage);
+
+
+// Guidance routes
+router.get('/guidance', guidanceController.g_guidance);
+router.get('/guidance/:page', guidanceController.g_guidancepage);
 
 router.get('/sign-in', authController.g_signin);
 router.get('/auth/t/:token', authController.g_checktoken);
