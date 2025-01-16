@@ -258,7 +258,7 @@ Complete
 
                 {% set isSubmittable = false %}
 
-                {% if standard.title and standard.summary and standard.purpose and standard.howToMeet and standard.categories and standard.sub_categories and standard.owners and standard.governance and standard.validityPeriod and standard.legalStandard %}
+                {% if standard.title and standard.summary and standard.purpose and standard.howToMeet and standard.categories and standard.sub_categories and standard.owners and standard.governance and standard.validityPeriod and (standard.legalStandard !=undefined) %}
 
                     {% set isSubmittable = true %}
 
@@ -314,7 +314,8 @@ Complete
                         <a href="/create/preview/{{standard.documentId}}" class="govuk-link govuk-link--no-visited-state" target="_blank">Open preview in a new tab</a>
                     </p>
 
-                    <p class="govuk-body">You can share the draft standard with others. Only users with access to this service and the link, can preview this standard.</p>
+                    <p class="govuk-body">You can share this draft standard with others.</p> 
+                    <p class="govuk-body">Only users with access to this service and the link, can preview this standard.</p>
 
                     <p class="govuk-body">You will not be able to share this standard publicly.</p>
 
