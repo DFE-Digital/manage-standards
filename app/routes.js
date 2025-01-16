@@ -72,6 +72,7 @@ router.get('/standard/:slug', isAuthenticated, standardsController.g_standardByS
 router.get('/standard/:slug/history', isAuthenticated, standardsController.g_standardHistoryBySlug);
 
 router.post('/standards/standard/publish', isAuthenticated, standardsController.p_publish_standard);
+router.post('/standards/standard/updatedpublish', isAuthenticated, standardsController.p_updatedpublish);
 
 //Editors
 router.post('/standard/editor/summary', isAuthenticated, standardsController.p_edit_summary);

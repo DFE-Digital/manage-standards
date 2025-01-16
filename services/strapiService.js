@@ -308,7 +308,7 @@ const getStandardsOwnedByUserDocumentId = async (userId) => {
         const uniqueData = mergedData.filter((v, i, a) => a.findIndex(t => (t.documentId === v.documentId)) === i);
 
         console.log(uniqueData);
-     
+
         return uniqueData
     } catch (error) {
 
@@ -347,7 +347,6 @@ const getStandardBySlug = async (slug) => {
 
 const getStandardByDocumentId = async (documentId) => {
 
-
     try {
         const response = await strapiClient.get(`/api/standards`, {
             params: {
@@ -356,8 +355,6 @@ const getStandardByDocumentId = async (documentId) => {
                 status: 'Draft'
             },
         });
-
-
 
         // Return the standard data
         return response.data.data[0]; // Assuming slug is unique and returning the first match
@@ -1612,7 +1609,7 @@ const submitStandard = async (id) => {
 
 
 const updateSubCategories = async (id, selectedSubCategories) => {
-    
+
     try {
 
         console.log(selectedSubCategories);
@@ -1643,7 +1640,7 @@ const updateSubCategories = async (id, selectedSubCategories) => {
 }
 
 const submitOutcome = async (documentId, outcome) => {
-    
+
     try {
 
         const stage = await getStageDocumentId(outcome);
@@ -1766,7 +1763,7 @@ const createAuditLog = async (payload) => {
         if (!payload || !payload.data || typeof payload.data !== 'object') {
             throw new Error('Invalid payload format. Expected an object with a "data" property.');
         }
-        
+
         const response = await strapiClient.post('/api/audits', payload);
 
         // Check response structure
@@ -1786,10 +1783,35 @@ const createAuditLog = async (payload) => {
     }
 };
 
+// Just set to published
 
+const updatedPublishStandard = async (documentId) => {
+    try {
+
+        const payload = {
+            data: {
+                isModified: 0
+            }
+        };
+
+        const response = await strapiClient.put(`/api/standards/${documentId}`, payload);
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        return response.data.data;
+    } catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        throw new Error(`Error publishing standard: ${error.message}`);
+    }
+}
 
 
 
 module.exports = {
-    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog
+    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog, updatedPublishStandard
 };

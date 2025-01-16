@@ -96,9 +96,6 @@ exports.g_standard_manage = async (req, res, next) => {
 
         const standard = await strapiService.getStandardByDocumentId(documentId);
 
-        console.log('Get manage')
-        console.log(standard);
-
         if (standard.stage.title === 'Draft') {
             return res.redirect(`/create/getdraft/${documentId}`);
         }
@@ -193,6 +190,29 @@ exports.p_publish_standard = async (req, res, next) => {
     }
 }
 
+exports.p_updatedpublish = async (req, res, next) => {
+
+    // Just set the documentId to published
+
+    try {
+        const { documentId } = req.body;
+
+        const oldStandard = await strapiService.getStandardByDocumentId(documentId);
+
+        const standard = await strapiService.updatedPublishStandard(documentId);
+
+        return res.redirect(`/standards/standard/manage/${documentId}`);
+    }
+
+    catch (error) {
+        console.error('Error publishing standard:', error);
+        res.status(500).render('error', {
+            title: 'Error',
+            message: 'Failed to publish standard. Please try again later.'
+        });
+    }
+}
+
 
 
 // Editors
@@ -215,9 +235,6 @@ exports.p_edit_summary = [
 
         try {
             const updatedStandard = await strapiService.updateSummary(documentId, summary);
-
-            console.log('edit summary manage')
-console.log(updatedStandard)
 
             req.session.Standard = updatedStandard;
             return res.redirect('/standards/standard/manage/' + standard.documentId);

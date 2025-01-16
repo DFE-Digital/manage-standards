@@ -100,6 +100,16 @@
 
             {% endif %}
 
+            {{standard.isModified}}
+{% if standard.isModified == true %}
+            <form action="/standards/standard/updatedpublish" method="post">
+                <input type="hidden" name="documentId" value="{{standard.documentId}}">
+                <div class="govuk-button-group">
+                    <button type="submit" class="govuk-button">Publish</button>
+                </div>
+            </form>
+            {% endif %}
+
             {% if mode == 'edit' and section == 'summary' %}
             {% include './_summary.html' %}
             {% else %}
