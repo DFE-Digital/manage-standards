@@ -132,6 +132,7 @@ router.post('/create/standard/submit', isAuthenticated, createController.p_submi
 router.get('/admin', isAuthenticated, isAdmin, adminController.g_admin);
 router.get('/admin/review', isAuthenticated, isAdmin, adminController.g_review);
 router.get('/admin/standards', isAuthenticated, isAdmin, adminController.g_standards);
+router.get('/admin/draft-standards', isAuthenticated, isAdmin, adminController.g_draftstandards);
 router.get('/admin/admins', isAuthenticated, isAdmin, adminController.g_admins);
 router.get('/admin/admins/person/:id', isAuthenticated, isAdmin, adminController.g_person);
 router.get('/admin/standard/:documentId', isAuthenticated, isAdmin, adminController.g_standard);

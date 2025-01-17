@@ -10,6 +10,7 @@ exports.g_standards = async (req, res, next) => {
 
         const standards = await strapiService.getStandardsOwnedByUserDocumentId(user.documentId);
 
+
         return res.render('standards/index', { standards });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);

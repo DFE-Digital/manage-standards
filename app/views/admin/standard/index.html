@@ -14,24 +14,44 @@
                         <a href="/admin/standards" class="govuk-back-link">Back</a>
                     {% endif %}
                     <h1 class="govuk-heading-xl govuk-!-margin-bottom-3 govuk-!-margin-top-0">{{ standard.title }}</h1>
-                    <table class="govuk-table  govuk-!-margin-bottom-5">
-                        <thead class="govuk-table__head">
-                            <tr class="govuk-table__row">
-                                <th class="govuk-table__header" scope="col">Reference</th>
-                                <th class="govuk-table__header" scope="col">Version</th>
-                                <th class="govuk-table__header" scope="col">Published</th>
-                                <th class="govuk-table__header" scope="col">Updated</th>
-                            </tr>
-                        </thead>
-                        <tbody class="govuk-table__body">
-                            <tr class="govuk-table__row">
-                                <td class="govuk-table__cell">DDTS-{{standard.standardId}}</td>
-                                <td class="govuk-table__cell">v.{{standard.version}}</td>
-                                <td class="govuk-table__cell">{{standard.firstPublished | date('D MMMM YYYY')}}</td>
-                                <td class="govuk-table__cell">{{standard.lastUpdated | date('D MMMM YYYY')}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                  <table class="govuk-table  govuk-!-margin-bottom-5">
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th class="govuk-table__header" scope="col">Reference</th>
+            <th class="govuk-table__header" scope="col">Stage</th>
+            <th class="govuk-table__header" scope="col">Version</th>
+            <th class="govuk-table__header" scope="col">Published</th>
+            <th class="govuk-table__header" scope="col">Updated</th>
+            <th class="govuk-table__header" scope="col">View</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell">DDTS-{{standard.standardId}}</td>
+            <td class="govuk-table__cell">
+                {% if standard.stage.title === 'Draft' %}
+                <strong class="govuk-tag govuk-tag--yellow">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Approval' %}
+                <strong class="govuk-tag govuk-tag--orange">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Approved' %}
+                <strong class="govuk-tag govuk-tag--green">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Rejected' %}
+                <strong class="govuk-tag govuk-tag--red">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Published' %}
+                <strong class="govuk-tag govuk-tag--blue">{{standard.stage.title}}</strong>
+                {% elseif standard.stage.title === 'Archived' %}
+                <strong class="govuk-tag govuk-tag--grey">{{standard.stage.title}}</strong>
+                {% endif %}
+            </td>
+            <td class="govuk-table__cell">v.{{standard.version}}</td>
+            <td class="govuk-table__cell">{{standard.firstPublished | date('D MMM YYYY')}}</td>
+            <td class="govuk-table__cell">{{standard.lastUpdated | date('D MMM YYYY')}}</td>
+            <td class="govuk-table__cell">
+                <a href="https://standards.education.gov.uk/standard/{{standard.standardId}}">View standard</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
                 </div>
             </div>
         </div>
@@ -175,6 +195,7 @@
                 {% endif %}
                 <h2 id="categories" class="govuk-heading-l">Categories</h2>
                 <p>The categories applicable to this standard are:</p>
+
                 <dl class="govuk-summary-list">
                     {% for category in standard.categories %}
                         <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
@@ -193,6 +214,7 @@
                         </div>
                     {% endfor %}
                 </dl>
+
                 <h2 id="purpose" class="govuk-heading-l">Purpose</h2>
                 <p class="govuk-body">{% markdown %}{{standard.purpose | safe }}{% endmarkdown %}</p>
                 <h2 id="howtommeet" class="govuk-heading-l">How to meet this standard</h2>
@@ -278,63 +300,72 @@
                 {% else %}
                     <p class="govuk-body">There have been no previous reviews for this standard.</p>
                 {% endif %}
+
                 <h2 id="outcome" class="govuk-heading-l govuk-!-margin-top-5">Outcome</h2>
-                <p>When reviewing, you must ensure the standard:</p>
-                <ul class="govuk-list govuk-list--bullet">
-                    <li>is complete</li>
-                    <li>can be applied in a binary way</li>
-                    <li>is clear and unambiguous</li>
-                    <li>is written using plain language and any acronyms, initialisms, and abbreviations are written out in full</li>
-                    <li>contains no commercially sensitive or secret information, which could damage department reputation or put the department at risk</li>
-                    <li>is not a duplicate of another standard</li>
-                </ul>
-                <div class="govuk-summary-card  govuk-!-margin-top-9">
-                    <div class="govuk-summary-card__title-wrapper">
-                        <h2 class="govuk-summary-card__title">Standard forum outcome</h2>
-                    </div>
-                    <div class="govuk-summary-card__content govuk-!-padding-top-5">
-                        <form method="post" action="/admin/standard/outcome" method="post">
-                            <input type="hidden" name="documentId" value="{{standard.documentId}}">
-                            <div class="govuk-form-group">
-                                <fieldset class="govuk-fieldset" aria-describedby="outcome-hint">
-                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">What is the standard forum outcome?</legend>
-                                    <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
-                                        <div class="govuk-radios__item">
-                                            <input class="govuk-radios__input" id="outcome" name="outcome" type="radio" value="Approved">
-                                            <label class="govuk-label govuk-radios__label" for="outcome">
+                {% if standard.stage.title === 'Published' %}
+                
+
+                    <p class="govuk-body">This standard is published. There is no review needed.</p>
+                {% else %}
+    <p>When reviewing, you must ensure the standard:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>is complete</li>
+                        <li>can be applied in a binary way</li>
+                        <li>is clear and unambiguous</li>
+                        <li>is written using plain language and any acronyms, initialisms, and abbreviations are written out in full</li>
+                        <li>contains no commercially sensitive or secret information, which could damage department reputation or put the department at risk</li>
+                        <li>is not a duplicate of another standard</li>
+                    </ul>
+                    <div class="govuk-summary-card  govuk-!-margin-top-9">
+                        <div class="govuk-summary-card__title-wrapper">
+                            <h2 class="govuk-summary-card__title">Standard forum outcome</h2>
+                        </div>
+                        <div class="govuk-summary-card__content govuk-!-padding-top-5">
+                            <form method="post" action="/admin/standard/outcome" method="post">
+                                <input type="hidden" name="documentId" value="{{standard.documentId}}">
+                                <div class="govuk-form-group">
+                                    <fieldset class="govuk-fieldset" aria-describedby="outcome-hint">
+                                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">What is the standard forum outcome?</legend>
+                                        <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                                            <div class="govuk-radios__item">
+                                                <input class="govuk-radios__input" id="outcome" name="outcome" type="radio" value="Approved">
+                                                <label class="govuk-label govuk-radios__label" for="outcome">
                               Approve
                               </label>
-                                        </div>
-                                        <div class="govuk-radios__item">
-                                            <input class="govuk-radios__input" id="outcome-2" name="outcome" type="radio" value="Rejected">
-                                            <label class="govuk-label govuk-radios__label" for="outcome-2">
+                                            </div>
+                                            <div class="govuk-radios__item">
+                                                <input class="govuk-radios__input" id="outcome-2" name="outcome" type="radio" value="Rejected">
+                                                <label class="govuk-label govuk-radios__label" for="outcome-2">
                               Reject
                               </label>
+                                            </div>
                                         </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="1000">
-                                <label class="govuk-label govuk-label--m" for="comments">
+                                    </fieldset>
+                                </div>
+                                <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="1000">
+                                    <label class="govuk-label govuk-label--m" for="comments">
                      Forum outcome comments
                      </label>
-                                <div id="comments-hint" class="govuk-hint">
+                                    <div id="comments-hint" class="govuk-hint">
                         Optional comments which will go back to the standard owners and submittor.
                      </div>
-                                <textarea class="govuk-textarea govuk-js-character-count" id="comments" name="comments" rows="5" aria-describedby="comments-info comments-hint"></textarea>
-                                <div id="comments-info" class="govuk-hint govuk-character-count__message">
+                                    <textarea class="govuk-textarea govuk-js-character-count" id="comments" name="comments" rows="5" aria-describedby="comments-info comments-hint"></textarea>
+                                    <div id="comments-info" class="govuk-hint govuk-character-count__message">
                         You can enter up to 1,000 characters
                      </div>
-                            </div>
-                            <button type="submit" class="govuk-button" data-module="govuk-button">
+                                </div>
+                                <button type="submit" class="govuk-button" data-module="govuk-button">
                   Submit outcome
                   </button>
-                        </form>
+                            </form>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>
+
+
     <style>
         @media (min-width: 768px) {
             /* Apply sticky for larger screens */

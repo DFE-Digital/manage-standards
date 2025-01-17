@@ -351,8 +351,21 @@ const getStandardByDocumentId = async (documentId) => {
         const response = await strapiClient.get(`/api/standards`, {
             params: {
                 'filters[documentId][$eq]': documentId,
-                populate: '*',
-                status: 'Draft'
+                populate: {
+                    categories: true,
+                    owners: true,
+                    contacts: true,
+                    approvedProducts: true,
+                    toleratedProducts: true,
+                    exceptions: true,
+                    standard_comments: true,
+                    stage: true,
+                    sub_categories: {
+                        populate: {
+                            category: true, // Deep population for sub_categories -> category
+                        },
+                    },
+                },
             },
         });
 
@@ -925,16 +938,28 @@ const removeAdmin = async (id) => {
     }
 }
 
-const getStandards = async () => {
+const getStandards = async (includeDraft = false) => {
 
     try {
 
-        const response = await strapiClient.get(`/api/standards`, {
+        let response = []
+        if (includeDraft) {
+
+            response = await strapiClient.get(`/api/standards?status=draft`, {
             params: {
                 populate: '*',
-                'filters[stage][title][$eq]': 'Published',
+                    'filters[stage][title][$eq]': 'Draft',
             },
         });
+
+        } else {
+            response = await strapiClient.get(`/api/standards`, {
+                params: {
+                    populate: '*',
+                    'filters[stage][title][$eq]': 'Published',
+                },
+            });
+        }
 
         // Validate response structure
         if (!response || !response.data) {
@@ -954,16 +979,29 @@ const getStandards = async () => {
 }
 
 // Returns number of published standards
-const getCountStandards = async () => {
+// Optionally filter by including draft standards
+const getCountStandards = async (includeDraft = false) => {
 
     try {
 
-        const response = await strapiClient.get(`/api/standards`, {
-            params: {
-                'filters[stage][title][$eq]': 'Published',
-                fields: 'id'
-            },
-        });
+        // Include draft standards if includeDraft is true
+
+        let response = []
+        if (includeDraft) {
+
+            response = await strapiClient.get(`/api/standards?status=draft`, {
+                params: {
+                    'filters[stage][title][$eq]': 'Draft',
+                    fields: 'id',
+                },
+            });
+        } else {
+            response = await strapiClient.get(`/api/standards`, {
+                params: {
+                    'filters[stage][title][$eq]': 'Published',
+                },
+            });
+        }
 
         // Validate response structure
         if (!response || !response.data) {
@@ -1810,8 +1848,64 @@ const updatedPublishStandard = async (documentId) => {
     }
 }
 
+/**
+ * Fetches the titles and slugs of active categories directly from Strapi.
+ * @returns {Promise<Array<{ title: string, slug: string }>>} 
+ *          A promise that resolves to an array of objects containing the title and slug of each active category.
+ */
+const getCategoryTitles = async () => {
+    const cacheKey = 'active_categories_titles_slugs';
 
+
+    try {
+        logger.info('Fetching active categories titles and slugs from Strapi');
+
+        const response = await strapiClient.get('/api/categories', {
+            params: {
+                sort: 'title',
+                filters: {
+                    active: true
+                },
+                fields: ['title', 'slug'] // Request only the necessary fields
+            },
+        });
+
+        // Log the entire response data for debugging
+        logger.debug(`Strapi response data: ${JSON.stringify(response.data)}`);
+
+        // Validate response structure
+        if (!response.data || !Array.isArray(response.data.data)) {
+            throw new Error('Invalid response structure from Strapi');
+        }
+
+        const categories = response.data.data;
+
+        // Extract title and slug from each active category
+        const categoryTitlesSlugs = categories.map(category => {
+            const { title, slug } = category;
+
+            if (!title || !slug) {
+                logger.warn(`Category with ID ${category.id} is missing title or slug`);
+            }
+
+            return { title, slug };
+        });
+
+        // Optionally, remove entries with missing title or slug
+        const validCategoryTitlesSlugs = categoryTitlesSlugs.filter(item => item.title && item.slug);
+
+        // Store the processed data in cache
+        cache.set(cacheKey, validCategoryTitlesSlugs);
+
+        logger.info('Active categories titles and slugs fetched and cached successfully');
+
+        return validCategoryTitlesSlugs;
+    } catch (error) {
+        logger.error(`Error fetching active categories titles and slugs from Strapi: ${error.message}`);
+        throw error; // Propagate the error to the controller or higher-level handler
+    }
+};
 
 module.exports = {
-    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog, updatedPublishStandard
+    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog, updatedPublishStandard, getCategoryTitles
 };

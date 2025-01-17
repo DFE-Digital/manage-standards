@@ -10,7 +10,7 @@
         <div class="govuk-width-container">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <h1 class="govuk-heading-xl govuk-!-margin-top-5">{{pageName}}</h1>
+                    <h1 class="govuk-heading-xl govuk-!-margin-top-5">{% if drafts %}Draft standards{% else %}Published standards{% endif %}</h1>
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
                 </div>
                 <div class="govuk-grid-column-three-quarters">
 
- <h1 class="govuk-heading-l">All published standards</h1>
+ <h1 class="govuk-heading-l">{% if drafts %}All draft standards{% else %}Published standards{% endif %}</h1>
                  <p id="count"></p>
 
             
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (hasFilters) {
             header.textContent = `${visibleRowCount} result${visibleRowCount === 1 ? "" : "s"}`;
         } else {
-            header.textContent = "All published standards";
+            header.textContent = "Standards";
         }
     }
 

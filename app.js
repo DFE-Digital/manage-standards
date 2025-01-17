@@ -2,14 +2,17 @@
 const express = require('express');
 const nunjucks = require('nunjucks');
 const path = require('path');
-const compression = require('compression');
+const compression = require('compression'); 
+const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const logger = require('./utils/logger'); // Import the Winston logger
 const appRoutes = require('./app/routes.js');
 var markdown = require('nunjucks-markdown')
 var dateFilter = require('nunjucks-date-filter')
 var marked = require('marked')
-const pg = require('pg');
+const pg = require('pg'); 
+const airtable = require('airtable');
+const base = new airtable({ apiKey: process.env.airtableFeedbackKey }).base(process.env.airtableFeedbackBase);
 
 const session = require('express-session');
 const pgSession = require('connect-pg-simple')(session);
@@ -62,6 +65,9 @@ app.use(session({
     cookie: { maxAge: 365 * 24 * 60 * 60 * 1000 }
 }));
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 // Configure Morgan to use Winston for HTTP request logging
 // app.use(morgan('combined', { stream: { write: msg => logger.info(msg.trim()) } }));
@@ -98,6 +104,8 @@ app.locals.manualURL = process.env.manualURL;
 app.use('/govuk', express.static(path.join(__dirname, 'node_modules/govuk-frontend/govuk/assets')));
 app.use('/dfe', express.static(path.join(__dirname, 'node_modules/dfe-frontend/dist')));
 
+
+
 // Serve custom static files
 app.use('/assets', express.static('public/assets'));
 
@@ -106,6 +114,58 @@ app.use(express.urlencoded({ extended: true }));
 
 // Set view engine to Nunjucks with .html extension
 app.set('view engine', 'html');
+
+
+// Route for handling Yes/No feedback submissions
+app.post('/form-response/helpful', (req, res) => {
+    const { response } = req.body;
+    const pageURL = req.headers.referer || 'Unknown';
+    const date = new Date().toISOString();
+
+
+    base('Data').create([
+        {
+            "fields": {
+                "Response": response,
+                "Service": 'Create and manage standards',
+                "URL": pageURL
+            }
+        }
+    ], function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error saving to Airtable');
+        }
+        res.json({ success: true, message: 'Feedback submitted successfully' });
+    });
+});
+
+// New route for handling detailed feedback submissions
+app.post('/form-response/feedback', (req, res) => {
+    const { response } = req.body;
+
+
+    console.log(req)
+
+    // Example service name
+    const pageURL = req.headers.referer || 'Unknown'; // Attempt to capture the referrer URL
+    const date = new Date().toISOString();
+
+    base('Feedback').create([{
+        "fields": {
+            "Feedback": response,
+            "Service": 'Create and manage standards',
+            "URL": pageURL
+        }
+    }], function (err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error saving to Airtable');
+        }
+        res.json({ success: true, message: 'Feedback submitted successfully' });
+    });
+});
+
 
 // Use application routes
 app.use('/', appRoutes);
@@ -123,6 +183,7 @@ app.get(/\.html?$/i, function (req, res) {
 app.get(/^([^.]+)$/, function (req, res, next) {
     matchRoutes(req, res, next);
 });
+
 
 // Function to render paths
 function renderPath(path, res, next) {
