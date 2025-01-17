@@ -183,6 +183,21 @@
                         </div>
                     </div>
                 {% endif %}
+                         {% if standard.stage.title === 'Draft' %}
+                    <div class="govuk-notification-banner govuk-notification-banner--warning" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                        <div class="govuk-notification-banner__header">
+                            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                  Important
+               </h2>
+                        </div>
+                        <div class="govuk-notification-banner__content">
+                            <p class="govuk-notification-banner__heading">
+                  This standard is being drafted.
+               </p>
+                            <p>It has not yet been submitted for approval.</p>
+                        </div>
+                    </div>
+                {% endif %}
                 <h2 id="summary" class="govuk-heading-l">Summary</h2>
                 <p class="govuk-body">{% markdown %}{{standard.summary | safe }}{% endmarkdown %}</p>
                 {% if standard.legalStandard == true %}
@@ -306,6 +321,8 @@
                 
 
                     <p class="govuk-body">This standard is published. There is no review needed.</p>
+                {% elseif standard.stage.title === 'Draft' %}
+                  <p class="govuk-body">This standard is being drafted. You cannot approve this yet.</p>
                 {% else %}
     <p>When reviewing, you must ensure the standard:</p>
                     <ul class="govuk-list govuk-list--bullet">

@@ -381,7 +381,7 @@ const getStandardBySlug = async (slug) => {
 const getStandardByDocumentId = async (documentId) => {
 
     try {
-        const response = await strapiClient.get(`/api/standards`, {
+        const response = await strapiClient.get(`/api/standards?status=draft`, {
             params: {
                 'filters[documentId][$eq]': documentId,
                 populate: {

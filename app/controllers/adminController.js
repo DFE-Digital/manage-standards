@@ -82,8 +82,13 @@ exports.g_standard = async (req, res, next) => {
         // Fetch the standard by documentId
         const standard = await strapiService.getStandardByDocumentId(req.params.documentId);
 
-        // Extract and sort the standard_comments
-        const standardComments = standard.standard_comments || [];
+        // Extract and sort the standard_comments 
+        // if stadard_comments is not available, set it to an empty array
+
+
+
+        const standardComments = standard.standard_comments ?? [];
+        
         const sortedStandardComments = standardComments.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
 
         // Pass the standard and sorted comments to the view
