@@ -22,6 +22,43 @@ const strapiClient = axios.create({
 // Initialize cache (cache for 1 hour)
 const cache = new NodeCache({ stdTTL: cacheTimeout });
 
+const getStageId = async (title) => {
+    if (!title || typeof title !== 'string') {
+        throw new Error("Invalid title: A valid string title must be provided.");
+    }
+
+    try {
+       
+            const response = await strapiClient.get(`/api/stages`, {
+                params: {
+                    'filters[title][$eq]': title,
+                },
+            });
+
+            // Validate response structure
+            if (!response || !response.data) {
+                throw new Error("Unexpected response format from Strapi API.");
+            }
+
+            // Ensure data is an array or handle empty results
+            if (!Array.isArray(response.data) || response.data.length === 0) {
+                throw new Error(`No stage found with title: ${title}`);
+            }
+
+            // Cache the stage ID
+            const stageId = response.data[0].id;
+
+            return stageId;
+        
+    } catch (error) {
+        // Log the error with additional context
+        console.error(`Failed to fetch stage with title: ${title}`, error.message);
+
+        // Rethrow the error with a meaningful message
+        throw new Error(`Error fetching stage: ${error.message}`);
+    }
+};
+
 
 const getUser = async (email) => {
     if (!email || typeof email !== 'string') {
@@ -485,12 +522,15 @@ const createStandardDraft = async (userId, title) => {
         throw new Error("Invalid title: A valid string title must be provided.");
     }
 
+    // Get the Draft stage ID
+    const stage = await getStageDocumentId('Draft');
+
     try {
         // Step 1: Create the draft
         const createPayload = {
             data: {
                 title: title,
-                stage: 3,
+                stage: stage,
                 creator: userId,
                 previousVersion: 0,
                 draftCreated: new Date(),
@@ -1994,5 +2034,5 @@ const getCategoryTitles = async () => {
 };
 
 module.exports = {
-    getUser, createUser, recycleToken, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog, updatedPublishStandard, getCategoryTitles, updateSummaryAndPublish, updatePurposeAndPublish
+    getStageId, getUser, createUser, recycleToken, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog, updatedPublishStandard, getCategoryTitles, updateSummaryAndPublish, updatePurposeAndPublish
 };
