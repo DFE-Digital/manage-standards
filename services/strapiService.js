@@ -452,14 +452,7 @@ const getStandardsDraftByUser = async (userId) => {
     }
 
     try {
-        const response = await strapiClient.get(`/api/standards`, {
-            params: {
-                populate: '*',
-                'filters[creator][id][$eq]': userId,
-                status: 'Draft',
-                'filters[stage][title][$eq]': 'Draft',
-            },
-        });
+        const response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[$or][0][creator][$eq]=${userId}&filters[$or][1][owners][$in]=${userId}&filters[stage][title][$eq]=Draft`)
 
         // Validate response structure
         if (!response || !response.data) {
@@ -852,19 +845,12 @@ const updateLegality = async (id, legality) => {
     }
 };
 
-
 const getStandardDraft = async (id, userId) => {
-    // Get the standard draft by ID and where the creator is the user
-
     try {
-        const response = await strapiClient.get(`/api/standards`, {
-            params: {
-                populate: '*',
-                'filters[creator][id][$eq]': userId,
-                status: 'Draft',
-                'filters[documentId][$eq]': id,
-            },
-        });
+      
+
+        const response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[documentId][$eq]=${id}&filters[$or][0][creator][$eq]=${userId}&filters[$or][1][owners][$in]=${userId}&filters[stage][title][$eq]=Draft`)
+
 
         // Validate response structure
         if (!response || !response.data) {
@@ -881,7 +867,7 @@ const getStandardDraft = async (id, userId) => {
 
         // Rethrow the error with a meaningful message
         throw new Error(`Error fetching standard: ${error.message}`);
-    }
+    }   
 };
 
 const getPreview = async (documentId) => {
