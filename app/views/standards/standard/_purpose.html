@@ -1,0 +1,51 @@
+<div class="govuk-summary-card" id="summary" >
+    <div class="govuk-summary-card__title-wrapper">
+        <h2 class="govuk-summary-card__title">
+      Edit purpose
+    </h2>
+        <ul class="govuk-summary-card__actions">
+
+            <li class="govuk-summary-card__action">
+                <a class="govuk-link" href="/standards/standard/manage/{{standard.documentId}}">Cancel edit<span class="govuk-visually-hidden"> of summary content</span></a>
+            </li>
+        </ul>
+    </div>
+    <div class="govuk-summary-card__content">
+        {% include './errorSummary.html' %}
+
+        <form action="/standard/editor/purpose" method="post">
+            <input type="hidden" name="documentId" value="{{ standard.documentId }}">
+
+                   <div class="govuk-form-group govuk-character-count {% if errors %} govuk-form-group--error{% endif %}" data-module="govuk-character-count" data-maxlength="2000">
+                        <h2 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--l" for="purpose">
+                                Purpose
+                            </label>
+                        </h2>
+                        <div id="purpose-hint-hint" class="govuk-hint">
+    Describe why this standard is important
+  </div>
+
+                        {% if errors %}
+                            <p id="event-name-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span>
+                                {% for err in errors %}
+                                    {{ err.msg }}
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                        <textarea class="govuk-textarea govuk-js-character-count {% if errors %} govuk-input--error{% endif %}" id="purpose" name="purpose" rows="10" aria-describedby="purpose-info purpose-hint-hint">{{standard.purpose}}</textarea>
+                        <div id="purpose-info" class="govuk-hint govuk-character-count__message">
+    You can enter up to 2,000 characters
+  </div>
+                    </div>
+
+
+        <div class="govuk-button-group">
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+            Save and continue
+          </button>
+        </div>
+    </form>
+</div>
+</div>

@@ -41,7 +41,7 @@
 
         {% block head %}{% endblock %}
     </head>
-
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WZ07C9GRZ3"></script>
     <body class="govuk-template__body ">
         <script>
             document.body.className += ' js-enabled' + (
@@ -57,14 +57,11 @@
         {% include 'layouts/_services.html'%}
 
         {%- block header -%}
-        
+
             {% include 'layouts/_publicheader.html'%}
         {%- endblock -%}
 
-        
-    {%- block hero -%}{%- endblock -%}
-
-
+        {%- block hero -%}{%- endblock -%}
 
         {% block main %}
             <main class="govuk-main-wrapper {{mainClasses}}" id="main-content" role="main">
@@ -78,7 +75,6 @@
 {%- block footer -%}
     {% include 'layouts/_footer.html'%}
 {%- endblock -%}
-
 <script src="/assets/js/all.min.js"></script>
 <script src="/assets/js/cookies.min.js"></script>
 <script src="/assets/js/feedback.min.js"></script>

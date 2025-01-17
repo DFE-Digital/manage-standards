@@ -50,7 +50,7 @@
                         <p class="govuk-body">The standard has been approved for publication by the standards forum.</p>
                         <p class="govuk-body">When you publish the standard, it will become available in the Standards manual immediately.</p>
                         <form method="post" action="/standards/standard/publish">
-                        <input type="hidden" name="documentId" value="{{ standard.documentId }}">
+                            <input type="hidden" name="documentId" value="{{ standard.documentId }}">
                             <div class="govuk-button-group">
                                 <button type="submit" class="govuk-button govuk-!-margin-bottom-0" name="action" value="publish">Publish</button>
                             </div>
@@ -72,7 +72,7 @@
                         <p>You should <a href="/standards/standard/manage/{{standard.documentId}}#reviewhistory">review the comments</a> from the standards forum and make the necessary changes.</p>
 
                         <form method="post" action="/standards/standard/revert">
-                        <input type="hidden" name="documentId" value="{{ standard.documentId }}">
+                            <input type="hidden" name="documentId" value="{{ standard.documentId }}">
                             <div class="govuk-button-group">
                                 <button type="submit" class="govuk-button">Revert to draft</button>
                             </div>
@@ -92,26 +92,18 @@
                     <div class="govuk-notification-banner__content">
                         <p class="govuk-notification-banner__heading">This standard is published.</p>
                         <p class="govuk-body">You can make changes to content, owners, and contacts, without getting reapproval from the standards forum.</p>
-                        <p class="govuk-body">Changes to approved and tolerated products will require the standard to go back through the approval process.</p>
+                        <p class="govuk-body">Changes to approved and tolerated products will require the standard to go back through the approval process. You cannot make these changes in this product at the moment.</p>
 
-                        <p class="govuk-body">You can read guidance for <a href="">making changes to published standards</a> for more information.</p>
+                        <p class="govuk-body">Contact the <a href="/support" class="govuk-link">standard forum</a> for help with changing approved or tolerated products in meantime.</p>
                     </div>
                 </div>
 
             {% endif %}
 
-            {{standard.isModified}}
-{% if standard.isModified == true %}
-            <form action="/standards/standard/updatedpublish" method="post">
-                <input type="hidden" name="documentId" value="{{standard.documentId}}">
-                <div class="govuk-button-group">
-                    <button type="submit" class="govuk-button">Publish</button>
-                </div>
-            </form>
-            {% endif %}
+       
 
             {% if mode == 'edit' and section == 'summary' %}
-            {% include './_summary.html' %}
+                {% include './_summary.html' %}
             {% else %}
                 <section id="summary" class="editable" tabindex="0">
                     <div class="edit-bar">
@@ -126,9 +118,13 @@
 
             {% endif %}
 
+
+   {% if mode == 'edit' and section == 'purpose' %}
+     {% include './_purpose.html' %}
+   {% else %}
             <section id="why" class="editable" tabindex="0">
                 <div class="edit-bar">
-                    <a href="#" class="govuk-link govuk-link--inverse">Edit this section</a>
+                      <a href="/standards/standard/edit-section/purpose/{{standard.documentId}}" class="govuk-link govuk-link--inverse">Edit this section</a>
                 </div>
 
                 <h2>Purpose</h2>
@@ -136,7 +132,7 @@
                 {{standard.purpose}}
                 {% endmarkdown %}
             </section>
-
+    {% endif %}
         </div>
     </div>
 </div>
@@ -199,15 +195,15 @@
     }
 </style>
 
- <script>
-        // Automatically scroll to the anchor if a section is provided
-        const section = "{{section}}"; // Dynamically rendered variable
-        if (section) {
-            const target = document.getElementById(section);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth' });
-            }
+<script>
+    // Automatically scroll to the anchor if a section is provided
+    const section = "{{section}}"; // Dynamically rendered variable
+    if (section) {
+        const target = document.getElementById(section);
+        if (target) {
+            target.scrollIntoView({behavior: 'smooth'});
         }
-    </script>
+    }
+</script>
 
 {% endblock %}

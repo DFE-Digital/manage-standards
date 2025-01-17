@@ -130,6 +130,39 @@ const createUser = async (email) => {
     }
 };
 
+// Recycle the user token based on email
+
+const recycleToken = async (email) => {
+    if (!email || typeof email !== 'string') {
+        throw new Error("Invalid email: A valid string email must be provided.");
+    }
+
+    try {
+        const user = await getUser(email);
+
+        if (user) {
+            const payload = {
+                token: Math.random().toString(36).substring(2, 30)
+            };
+            const response = await strapiClient.put(`/api/users/${user.id}`, payload);
+            if (!response || !response.data) {
+                throw new Error("Unexpected response format from Strapi API.");
+            }
+            return response.data.data;
+        }
+        return null;
+    } catch (error) {
+
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+        console.error(`Failed to recycle token for user with email: ${email}`, error.message);
+        throw new Error(`Error recycling token: ${error.message}`);
+    }
+};
+
+
+
 const createUserFull = async (firstName, lastName, email, jobRole) => {
     if (!email || typeof email !== 'string') {
         throw new Error("Invalid email: A valid string email must be provided.");
@@ -604,7 +637,40 @@ const updateSummary = async (id, summary) => {
     }
 };
 
+const updateSummaryAndPublish = async (id, summary) => {
+    if (!summary || typeof summary !== 'string') {
+        throw new Error("Invalid summary: A valid summary object must be provided.");
+    }
 
+    try {
+
+        const payload = {
+            data: {
+                summary: summary
+            }
+        };
+        const response = await strapiClient.put(`/api/standards/${id}`, payload);
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // console.log(response.data);
+
+        // Return the updated summary data
+        return response.data.data;
+    } catch (error) {
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to update summary with ID: ${summary.id}`, error.message);
+        throw new Error(`Error updating summary: ${error.message}`);
+    }
+};
 
 const updatePurpose = async (id, purpose) => {
     if (!purpose || typeof purpose !== 'string') {
@@ -624,6 +690,41 @@ const updatePurpose = async (id, purpose) => {
         if (!response || !response.data) {
             throw new Error("Unexpected response format from Strapi API.");
         }
+
+        // Return the updated purpose data
+        return response.data.data;
+    } catch (error) {
+        // Handle Axios-specific errors
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        // Log and rethrow the error with context
+        console.error(`Failed to update purpose with ID: ${purpose.id}`, error.message);
+        throw new Error(`Error updating purpose: ${error.message}`);
+    }
+};
+
+const updatePurposeAndPublish = async (id, purpose) => {
+    if (!purpose || typeof purpose !== 'string') {
+        throw new Error("Invalid purpose: A valid purpose object must be provided.");
+    }
+
+    try {
+
+        const payload = {
+            data: {
+                purpose: purpose
+            }
+        };
+        const response = await strapiClient.put(`/api/standards/${id}`, payload);
+
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        // console.log(response.data);
 
         // Return the updated purpose data
         return response.data.data;
@@ -1907,5 +2008,5 @@ const getCategoryTitles = async () => {
 };
 
 module.exports = {
-    getUser, createUser, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog, updatedPublishStandard, getCategoryTitles
+    getUser, createUser, recycleToken, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog, updatedPublishStandard, getCategoryTitles, updateSummaryAndPublish, updatePurposeAndPublish
 };

@@ -147,7 +147,11 @@ exports.g_standard_edit_section = async (req, res, next) => {
             return res.render('standards/standard/manage', { standard, mode: 'edit', section: 'summary' });
         }
 
-        return res.render('standards/standard/history', { standard });
+        if (section === 'purpose') {
+            return res.render('standards/standard/manage', { standard, mode: 'edit', section: 'purpose' });
+        }
+
+        return res.render('standards/standard/manage', { standard });
     } catch (error) {
         console.error('Error fetching standard:', error);
         res.status(500).render('error', {
@@ -235,7 +239,7 @@ exports.p_edit_summary = [
         }
 
         try {
-            const updatedStandard = await strapiService.updateSummary(documentId, summary);
+            const updatedStandard = await strapiService.updateSummaryAndPublish(documentId, summary);
 
             req.session.Standard = updatedStandard;
             return res.redirect('/standards/standard/manage/' + standard.documentId);
@@ -245,3 +249,34 @@ exports.p_edit_summary = [
         }
     }
 ];
+
+exports.p_edit_purpose = [
+    validation.validatePurpose,
+    async (req, res) => {
+        const errors = validationResult(req);
+        const { documentId, purpose } = req.body;
+
+        const standard = await strapiService.getStandardByDocumentId(documentId);
+
+        if (!errors.isEmpty()) {
+            return res.render('standards/standard/manage', {
+                standard: standard,
+                errors: errors.array(),
+                purpose,
+                mode: 'edit', section: 'purpose'
+            });
+        }
+
+        try {
+            const updatedStandard = await strapiService.updatePurposeAndPublish(documentId, purpose);
+
+            req.session.Standard = updatedStandard;
+            return res.redirect('/standards/standard/manage/' + standard.documentId);
+        } catch (error) {
+            console.error('Error updating purpose:', error);
+            //return renderErrorPage(res, 'Failed to update purpose. Please try again later.');
+        }
+    }
+];
+
+

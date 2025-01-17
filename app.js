@@ -104,6 +104,28 @@ app.locals.manualURL = process.env.manualURL;
 app.use('/govuk', express.static(path.join(__dirname, 'node_modules/govuk-frontend/govuk/assets')));
 app.use('/dfe', express.static(path.join(__dirname, 'node_modules/dfe-frontend/dist')));
 
+app.get('/downloads/:filename', (req, res) => {
+    const filename = req.params.filename
+
+    if (!/^[a-zA-Z0-9-_]+\.(docx|pdf|xlsx)$/.test(filename)) {
+        return res.status(400).send('Invalid file name')
+    }
+
+    const filePath = path.join(__dirname, 'public/assets/downloads', filename)
+
+    if (!filePath.startsWith(path.join(__dirname, 'public/assets/downloads'))) {
+        return res.status(400).send('Invalid file path')
+    }
+    res.setHeader('Content-Disposition', `attachment; filename=${filename}`)
+
+    // Send the file
+    res.sendFile(filePath, (err) => {
+        if (err) {
+            console.error('File send error:', err)
+            res.status(500).send('Server error')
+        }
+    })
+})
 
 
 // Serve custom static files

@@ -82,6 +82,7 @@ router.post('/standards/standard/updatedpublish', isAuthenticated, standardsCont
 
 //Editors
 router.post('/standard/editor/summary', isAuthenticated, standardsController.p_edit_summary);
+router.post('/standard/editor/purpose', isAuthenticated, standardsController.p_edit_purpose);
 
 // Create routes
 router.get('/create', isAuthenticated, createController.g_start);
