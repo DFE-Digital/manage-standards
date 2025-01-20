@@ -490,7 +490,19 @@ const getStandardsDraftByUser = async (userId) => {
     }
 
     try {
-        const response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[$or][0][creator][$eq]=${userId}&filters[$or][1][owners][$in]=${userId}&filters[stage][title][$eq]=Draft`)
+
+        // If user is an admin, get all
+
+        const user = await getUserById(userId);
+
+        let response;
+
+        if (user.Administrator === true) {
+             response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[stage][title][$eq]=Draft`)
+        }
+        else{
+         response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[$or][0][creator][$eq]=${userId}&filters[$or][1][owners][$in]=${userId}&filters[stage][title][$eq]=Draft`)
+        }
 
         // Validate response structure
         if (!response || !response.data) {
@@ -889,9 +901,16 @@ const updateLegality = async (id, legality) => {
 const getStandardDraft = async (id, userId) => {
     try {
 
+        const user = await getUserById(userId);
 
-        const response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[documentId][$eq]=${id}&filters[$or][0][creator][$eq]=${userId}&filters[$or][1][owners][$in]=${userId}&filters[stage][title][$eq]=Draft`)
+        let response;
 
+        if (user.Administrator === true) {
+            response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[documentId][$eq]=${id}&filters[stage][title][$eq]=Draft`)
+        }
+        else {
+             response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[documentId][$eq]=${id}&filters[$or][0][creator][$eq]=${userId}&filters[$or][1][owners][$in]=${userId}&filters[stage][title][$eq]=Draft`)
+        }
 
         // Validate response structure
         if (!response || !response.data) {
