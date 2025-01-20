@@ -60,8 +60,7 @@
                         <select class="govuk-select govuk-!-width-one-half peoplelist" id="people" name="people">
                             <option value=""></option>
                             {% for person in people %}
-                                <option value="{{ person.documentId }}" {% if formBodu.people == person.documentId %}selected{% endif %}>{{ person.firstName }}
-                                    {{ person.lastName }} ({{person.JobRole}})</option>
+                                <option value="{{ person.documentId }}" {% if formBodu.people == person.documentId %}selected{% endif %}>{{ person.firstName }} {{ person.lastName }} ({{person.JobRole}})</option>
                             {% endfor %}
                         </select>
                     </div>
