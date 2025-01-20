@@ -211,7 +211,7 @@ const createUserFull = async (firstName, lastName, email, jobRole) => {
             email: email, // Required field
             firstName: firstName,
             lastName: lastName,
-            jobRole: jobRole,
+            JobRole: jobRole,
             username: email, // Ensure this field matches your schema
             password: Math.random().toString(36).substring(2, 12), // Default random password
             confirmed: true, // Only if required by your API
