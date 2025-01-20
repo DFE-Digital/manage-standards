@@ -6,6 +6,7 @@ const NodeCache = require('node-cache');
 const logger = require('../utils/logger');
 const { token } = require('morgan');
 const e = require('express');
+const { populate } = require('dotenv');
 
 const STRAPI_API_URL = process.env.STRAPI_API_URL || 'http://localhost:1338';
 const STRAPI_API_KEY = process.env.STRAPI_API_KEY;
@@ -1186,8 +1187,11 @@ const getSubCategories = async (categories) => {
             params: {
                 'filters[active][$eq]': 1,
                 sort: 'title', populate: '*',
+                fields: 'title'
             },
         });
+
+        console.log(response.data.data);
 
         // Validate response structure
         if (!response || !response.data) {
