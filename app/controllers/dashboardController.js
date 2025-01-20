@@ -5,7 +5,8 @@ exports.g_dashboard = async (req, res, next) => {
     try {
         const user = req.session.User;
 
-        // Some data...
+       console.log("Get dashboard")
+       console.log(user)    
 
         const standards = await strapiService.getStandardsOwnedByUserDocumentId(user.documentId);
         const standardsReview = await strapiService.getDraftsForApproval();

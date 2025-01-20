@@ -16,20 +16,20 @@ const adminController = require('./controllers/adminController.js');
 
 
 function isAuthenticated(req, res, next) {
- 
-    if (req.session && req.session.User) {
-        res.locals.user = req.session.User;
-        return next();
-    } else {
-
-        // if the route starts with router.get('/create/preview', then send to a page to say they need to be signed in, and then try again
-
-        if(req.originalUrl.startsWith('/create/preview')) {
-            return res.redirect('/need-to-sign-in');
+    try {
+        if (req.session && req.session.User) {
+            res.locals.user = req.session.User;
+            return next();
+        } else {
+            // if the route starts with router.get('/create/preview', then send to a page to say they need to be signed in, and then try again
+            if (req.originalUrl.startsWith('/create/preview')) {
+                return res.redirect('/need-to-sign-in');
+            }
+            return res.redirect('/sign-in');
         }
-
-
-        return res.redirect('/sign-in');
+    }
+    catch (error) {
+        console.log(error)
     }
 }
 
