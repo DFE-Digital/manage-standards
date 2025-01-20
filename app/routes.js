@@ -17,7 +17,11 @@ const adminController = require('./controllers/adminController.js');
 
 function isAuthenticated(req, res, next) {
     try {
+        console.log('Checking authentication')
         if (req.session && req.session.User) {
+            console.log('User is authenticated')
+            console.log(req.session.User)
+
             res.locals.user = req.session.User;
             return next();
         } else {
@@ -34,13 +38,7 @@ function isAuthenticated(req, res, next) {
 }
 
 function isAdmin(req, res, next) {
-
-    // This should do a call to Strapi to check if the user is an admin but for now we will just check the session
-
-    // can this be injected into the app.locals?
-
     if (req.session.User.Administrator == true) {
-
         return next();
     } else {
         return res.redirect('/dashboard');
