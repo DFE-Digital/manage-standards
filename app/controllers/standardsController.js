@@ -30,7 +30,7 @@ exports.g_standardBySlug = async (req, res, next) => {
         console.log(standard);
 
         if (!standard === undefined) {
-            console.log('No standard found');
+            console.log('***********************No standard found');
             return res.render('/dashboard/index', {
                 standard: []
             });
@@ -38,7 +38,7 @@ exports.g_standardBySlug = async (req, res, next) => {
 
         return res.render('standards/standard', { standard });
     } catch (error) {
-        console.log('Error fetching standard:', error);
+        console.log('***********************Error fetching standard:', error);
     }
 }
 
@@ -51,7 +51,7 @@ exports.g_standardHistoryBySlug = async (req, res, next) => {
         console.log(standard);
 
         if (!standard === undefined) {
-            console.log('No standard found');
+            console.log('***********************No standard found');
             return res.render('/dashboard', {
                 standard: []
             });
@@ -59,7 +59,7 @@ exports.g_standardHistoryBySlug = async (req, res, next) => {
 
         return res.render('standards/history', { standard });
     } catch (error) {
-        console.log('Error fetching standard:', error);
+        console.log('***********************Error fetching standard:', error);
     }
 }
 
@@ -234,7 +234,7 @@ exports.p_edit_summary = [
                 standard: standard,
                 errors: errors.array(),
                 summary,
-                mode: 'edit', section: 'summary' 
+                mode: 'edit', section: 'summary'
             });
         }
 

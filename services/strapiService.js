@@ -28,28 +28,28 @@ const getStageId = async (title) => {
     }
 
     try {
-       
-            const response = await strapiClient.get(`/api/stages`, {
-                params: {
-                    'filters[title][$eq]': title,
-                },
-            });
 
-            // Validate response structure
-            if (!response || !response.data) {
-                throw new Error("Unexpected response format from Strapi API.");
-            }
+        const response = await strapiClient.get(`/api/stages`, {
+            params: {
+                'filters[title][$eq]': title,
+            },
+        });
 
-            // Ensure data is an array or handle empty results
-            if (!Array.isArray(response.data) || response.data.length === 0) {
-                throw new Error(`No stage found with title: ${title}`);
-            }
+        // Validate response structure
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
 
-            // Cache the stage ID
-            const stageId = response.data[0].id;
+        // Ensure data is an array or handle empty results
+        if (!Array.isArray(response.data) || response.data.length === 0) {
+            throw new Error(`No stage found with title: ${title}`);
+        }
 
-            return stageId;
-        
+        // Cache the stage ID
+        const stageId = response.data[0].id;
+
+        return stageId;
+
     } catch (error) {
         // Log the error with additional context
         console.error(`Failed to fetch stage with title: ${title}`, error.message);
@@ -544,9 +544,9 @@ const createStandardDraft = async (userId, title) => {
             }
         };
 
-        // console.log('Creating standard draft with payload:', createPayload);
+        // console.log('***********************Creating standard draft with payload:', createPayload);
         const createResponse = await strapiClient.post(`/api/standards?status=draft`, createPayload);
-        // console.log('Draft created successfully:', createResponse.data);
+        // console.log('***********************Draft created successfully:', createResponse.data);
 
         if (!createResponse || !createResponse.data) {
             throw new Error("Unexpected response format from Strapi API during creation.");
@@ -572,7 +572,7 @@ const createStandardDraft = async (userId, title) => {
                 const updateResponse = await strapiClient.put(`/api/standards/${createResponse.data.data.documentId}?status=draft`, updatePayload);
 
                 if (updateResponse && updateResponse.data) {
-                    // console.log('Standard ID updated successfully:', updateResponse.data);
+                    // console.log('***********************Standard ID updated successfully:', updateResponse.data);
                     success = true;
                     return updateResponse.data.data;
                 }
@@ -887,7 +887,7 @@ const updateLegality = async (id, legality) => {
 
 const getStandardDraft = async (id, userId) => {
     try {
-      
+
 
         const response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[documentId][$eq]=${id}&filters[$or][0][creator][$eq]=${userId}&filters[$or][1][owners][$in]=${userId}&filters[stage][title][$eq]=Draft`)
 
@@ -907,7 +907,7 @@ const getStandardDraft = async (id, userId) => {
 
         // Rethrow the error with a meaningful message
         throw new Error(`Error fetching standard: ${error.message}`);
-    }   
+    }
 };
 
 const getPreview = async (documentId) => {
@@ -1073,11 +1073,11 @@ const getStandards = async (includeDraft = false) => {
         if (includeDraft) {
 
             response = await strapiClient.get(`/api/standards?status=draft`, {
-            params: {
-                populate: '*',
+                params: {
+                    populate: '*',
                     'filters[stage][title][$eq]': 'Draft',
-            },
-        });
+                },
+            });
 
         } else {
             response = await strapiClient.get(`/api/standards`, {

@@ -24,10 +24,10 @@ exports.g_checktoken = async (req, res, next) => {
             return res.redirect('/sign-in');
         }
 
-        console.log('Check token')
+        console.log('***********************Check token')
 
         //await strapiService.recycleToken(user.email);
-     
+
         // Set the user in the session
         req.session.User = user;
 

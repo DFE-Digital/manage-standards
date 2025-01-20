@@ -17,15 +17,15 @@ const adminController = require('./controllers/adminController.js');
 
 function isAuthenticated(req, res, next) {
     try {
-        console.log('Checking authentication')
+        console.log('***********************Checking authentication')
         if (req.session && req.session.User) {
-            console.log('User is authenticated')
+            console.log('***********************User is authenticated')
             console.log(req.session.User)
 
             res.locals.user = req.session.User;
             return next();
         } else {
-            console.log('User is not authenticated')
+            console.log('***********************User is not authenticated')
             console.log(req.session)
             // if the route starts with router.get('/create/preview', then send to a page to say they need to be signed in, and then try again
             if (req.originalUrl.startsWith('/create/preview')) {
