@@ -1282,32 +1282,42 @@ const updateCategories = async (id, selectedCategories) => {
     }
 }
 
-// Update the standard to set the approvedProducts to the selectedProduct if productType is 'Approved' and to set the toleratedProducts to the selectedProduct if productType is 'Tolerated'
-
+// Append added products to the existing list of approved or tolerated products
 const updateProducts = async (id, selectedProduct, productType) => {
 
-    try {
+    try{
 
-        let payload = {}
+        const standard = await getStandardByDocumentId(id);
 
         if (productType === 'Approved') {
+
+            const { approvedProducts } = standard;
+            const updatedApprovedProducts = [...approvedProducts.map((e) => e.documentId), selectedProduct];
+
             payload = {
                 data: {
-                    approvedProducts: selectedProduct
+                    approvedProducts: updatedApprovedProducts
                 }
             };
         }
 
         if (productType === 'Tolerated') {
+
+            const { toleratedProducts } = standard;
+            const updatedToleratedProducts = [...toleratedProducts.map((e) => e.documentId), selectedProduct];
+
             payload = {
                 data: {
-                    toleratedProducts: selectedProduct
+                    toleratedProducts: updatedToleratedProducts
                 }
             };
         }
 
 
         const response = await strapiClient.put(`/api/standards/${id}?status=draft`, payload);
+
+
+
 
         // Validate response structure
         if (!response || !response.data) {
