@@ -382,7 +382,7 @@ const getStandardsOwnedByUserDocumentId = async (userId) => {
         return uniqueData
     } catch (error) {
 
-        console.log(error.response.data.error);
+        console.log(error);
 
     }
 };
