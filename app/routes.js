@@ -25,6 +25,8 @@ function isAuthenticated(req, res, next) {
             res.locals.user = req.session.User;
             return next();
         } else {
+            console.log('User is not authenticated')
+            console.log(req.session)
             // if the route starts with router.get('/create/preview', then send to a page to say they need to be signed in, and then try again
             if (req.originalUrl.startsWith('/create/preview')) {
                 return res.redirect('/need-to-sign-in');
