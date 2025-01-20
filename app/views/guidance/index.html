@@ -1,22 +1,21 @@
-<!-- app/views/index.html -->
-
 {% if authenticated %}
 {% extends "layouts/layout.html" %}
 {% else %}
 {% extends "layouts/publiclayout.html" %}
 {% endif %}
 
-{% set pageName = 'Guidance' %}
+{% set pageName = 'Create and publish a standard' %}
 {% set selectedNav = 'Guidance' %}
-{% set pagePath = '/guidance' %}
-{% set pageDescription = "Understanding what standards are, why we have them, and how to apply them in your role." %}
+{% set pagePath = '/guidance/lifecycle' %}
+{% set pageDescription = "The lifecycle of a standard, from concept to publication and use across DfE." %}
 
 {% block hero %}
     <section class="dfe-page-header dfe-page-header--with-sub-nav">
         <div class="govuk-width-container">
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds">
-                    <h1 class="govuk-heading-xl govuk-!-margin-top-5">{{pageName}}</h1>
+                          <span class="govuk-caption-l  govuk-!-margin-top-5">{{selectedNav}}</span>
+                    <h1 class="govuk-heading-xl">{{pageName}}</h1>
                     <p class="govuk-body-l govuk-!-margin-bottom-6">{{pageDescription}}</p>
 
                 </div>
@@ -39,22 +38,64 @@
                 <div class="govuk-grid-column-three-quarters">
 
                  
+                    <p class="govuk-body">Standards move through several stages before they are published.</p>
 
-                    <p class="govuk-body">Standards are rules or guidelines that need to be followed. You must meet the relevant standards to ensure the expected quality levels for your service.</p>
-                    <p class="govuk-body">By following a common set of standards, we ensure consistency across the department and give ourselves a framework where we can measure compliance.</p>
+                   <div class="dfe-timeline">
+                    <ol>
 
-                    <p class="govuk-body">Standards should be:</p>
+                
 
-                    <ul class="govuk-list govuk-list--bullet">
-                        <li>easy to access, so everyone understands what they need to include as part of their delivery needs and can plan for this</li>
-                        <li>clear and simple, so it's easy to check if something meets a standard</li>
-                        <li>flexible, so they can change over time, if needed, as we update and manage new standards</li>
-                    </ul>
+                        <li>
+                            <h2 class="govuk-heading-m" id="proposal">Propose and draft standard</h2>
+                            <p class="govuk-body">Speak to the relevant Head of Profession, or leads, to confirm if there is a viable need for the standard.</p>
+                            <p class="govuk-body">Use the standard template to draft or revise a standard. This will help you detail the identified need, scope, and objective.</p>
+                            <div class="app-panel">
+                                <h3 class="govuk-heading-m">Download standard template</h3>
+                                <p class="govuk-body-s">
+                                    <a href="/downloads/2025_01_15_standard-template.docx" class="govuk-link">2025_01_15_standard-template.docx</a>
+                                </p>
+                                <p class="govuk-body-s  govuk-!-margin-bottom-2">Word - 74KB</p>
+                                <p class="govuk-body-s govuk-!-margin-bottom-0">Last updated: 15 January 2025</p>
+                            </div>
+                        </li>
+
+                        <li>
+                            <p class="govuk-body">Add the proposed standard to <a href="https://create-and-manage-standards.education.gov.uk" target="_blank">Create a standard</a> to submit it to the standards forum.</p>
+                        <li>
+                            <h2 class="govuk-heading-m" id="outcome">Review standard</h2>
+                            <p class="govuk-body">The standards forum will provide feedback to the standard owner and submittor.</p>
+                            <h3 class="govuk-heading-s">Approve standard</h3>
+                            <p class="govuk-body">The forum approves the standard.</p>
+                            <p class="govuk-body">The standard owner can then put comms and other processes in place before publication.</p>
+                            <h3 class="govuk-heading-s">Reject standard</h3>
+
+                            <p class="govuk-body">If the standard fails to meet criteria during the review, it is rejected. </p>
+                            <p class="govuk-body">Reasons are provided to the owner, and the standard may either be revised for resubmission or deleted.</p>
+                        </li>
+                        <li>
+                            <h2 class="govuk-heading-m" id="outcome">Publish standard</h2>
+                            <p class="govuk-body">Once approved, the standard can be published and made available for teams in <a href="https://create-and-manage-standards.education.gov.uk" target="_blank">Find and use a standard</a>.</p>
+                        </li>
+                        <li>
+                            <h2 class="govuk-heading-m" id="outcome">Archive standard</h2>
+                            <p class="govuk-body">Standards no longer required or abandoned, can be unpublished for an indeterminable amount of time and either revised or republished later.</p>
+                            <p class="govuk-body">For example, a standard could be superseded by another standard.</p>
+                        </li>
+                    </ol>
+                </div>
 
                 </div>
 
             </div>
         </div>
     </section>
+
+        <style>
+        .app-panel {
+            background-color: #f3f2f1;
+            padding: 2em;
+            margin-bottom: 30px;
+        }
+    </style>
 
 {% endblock %}
