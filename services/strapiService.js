@@ -1097,6 +1097,7 @@ const getStandards = async (includeDraft = false) => {
                 params: {
                     populate: '*',
                     'filters[stage][title][$eq]': 'Draft',
+                    sort: 'title',
                 },
             });
 
@@ -1104,7 +1105,8 @@ const getStandards = async (includeDraft = false) => {
             response = await strapiClient.get(`/api/standards`, {
                 params: {
                     populate: '*',
-                    'filters[stage][title][$eq]': 'Published',
+                    'filters[stage][title][$eq]': 'Published', 
+                    sort: 'title',
                 },
             });
         }
