@@ -433,7 +433,7 @@ exports.g_preview = async (req, res, next) => {
 
         const { documentId } = req.params;
 
-        const standard = await strapiService.getPreview(documentId);
+        const standard = await strapiService.getStandardByDocumentId(documentId);
 
         if (!standard) {
             return res.redirect('/create');
