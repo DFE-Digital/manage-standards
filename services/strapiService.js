@@ -430,6 +430,7 @@ const getStandardByDocumentId = async (documentId) => {
                     toleratedProducts: true,
                     exceptions: true,
                     standard_comments: true,
+                    creator: true,
                     stage: true,
                     sub_categories: {
                         populate: {
