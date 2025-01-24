@@ -369,26 +369,28 @@
                     <p class="govuk-body">{{standard.exceptions}}</p>
                 {% endif %}
                 <h2 id="owners" class="govuk-heading-l">Owner and contacts</h2>
-                <dl class="govuk-summary-list">
+ <dl class="govuk-summary-list">
                     {% for person in standard.owners %}
                         <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
                             <dt class="govuk-summary-list__key">
-                  Standard owner
-               </dt>
+                               Standard owner
+                            </dt>
                             <dd class="govuk-summary-list__value">
                                 <a href="mailto:{{person.email}}">{{person.firstName}}
-                                    {{person.lastName}}</a>
+                                    {{person.lastName}}</a><br/>
+                                    {{person.JobRole}}
                             </dd>
                         </div>
                     {% endfor %}
                     {% for person in standard.contacts %}
                         <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
                             <dt class="govuk-summary-list__key">
-                  Other point of contact
-               </dt>
+                               Other point of contact
+                            </dt>
                             <dd class="govuk-summary-list__value">
                                 <a href="mailto:{{person.email}}">{{person.firstName}}
-                                    {{person.lastName}}</a>
+                                    {{person.lastName}}</a><br/>
+                                    {{person.JobRole}}
                             </dd>
                         </div>
                     {% endfor %}
