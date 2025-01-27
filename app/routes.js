@@ -12,6 +12,7 @@ const dashboardController = require('./controllers/dashboardController.js');
 const standardsController = require('./controllers/standardsController.js');
 const createController = require('./controllers/createController.js');
 const adminController = require('./controllers/adminController.js');
+const testController = require('./controllers/testController.js');
 
 
 
@@ -146,5 +147,7 @@ router.post('/admin/standard/outcome', isAuthenticated, isAdmin, adminController
 
 // Compliance routes
 router.get('/compliance', isAuthenticated, complianceController.g_compliance);
+
+router.get('/check-links', testController.checkSitemapLinks);
 
 module.exports = router; 
