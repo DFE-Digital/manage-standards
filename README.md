@@ -20,6 +20,9 @@ Ensure you have the following installed:
 - [Node.js](https://nodejs.org/) (v16 or later recommended)
 - [PostgreSQL](https://www.postgresql.org/) (for session management)
 - [Strapi CMS](https://strapi.io/) instance
+- [GOV.UK Notify](https://www.notifications.service.gov.uk/) (for emails)
+
+[Contact the DesignOps team](#contact) for guidance on Notify templates.
 
 ## Getting Started
 
