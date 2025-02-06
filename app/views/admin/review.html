@@ -40,7 +40,7 @@
                                 <th class="govuk-table__header" scope="col">Title</th>
                                 <th class="govuk-table__header" scope="col">Reference</th>
                                 <th class="govuk-table__header" scope="col">Version</th>
-                                <th class="govuk-table__header" scope="col">Submitted</th>
+                                <th class="govuk-table__header" scope="col">Last updated</th>
                                 <th class="govuk-table__header" scope="col">Submitted by</th>
                             </tr>
                         </thead>
@@ -52,13 +52,15 @@
                                     </td>
                                     <td class="govuk-table__cell">DDTS-{{standard.standardId}}</td>
                                     <td class="govuk-table__cell">v.{{standard.version}}</td>
-                                    <td class="govuk-table__cell">{{standard.submitted | date('D MMM YYYY')}}</td>
+                                    <td class="govuk-table__cell">{{standard.updatedAt | date('D MMM YYYY')}}</td>
                                     <td class="govuk-table__cell">{{standard.creator.firstName}}
                                         {{standard.creator.lastName}}</td>
-                                </tr>
+                                </tr> 
                             {% endfor %}
                         </tbody>
                     </table>
+
+           
 
                 {% else %}
                     <p class="govuk-body">There are no standards to review.</p>
