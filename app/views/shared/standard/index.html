@@ -38,17 +38,11 @@
     </div>
 </div>
 {% endblock %}
-
 {% block content %}
-
-<section class="govuk-!-margin-bottom-0">
     <div class="govuk-width-container">
-
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-one-quarter sticky">
-
                 <h2 class="govuk-heading-m">Contents</h2>
-
                 <nav class="govuk-link-list sticky">
                     <ul class="govuk-list govuk-list--spaced">
                         <li class="govuk-link-list__item">
@@ -92,100 +86,152 @@
                             </li>
                         {% endif %}
                     </ul>
+                   
                 </nav>
-
             </div>
             <div class="govuk-grid-column-three-quarters">
-
-                {% if standard.stage.title === 'Draft' %}
-
+                {% if standard.stage.title === 'Published' %}
                     <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
                         <div class="govuk-notification-banner__header">
                             <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
-      Important
-    </h2>
+                  Important
+               </h2>
                         </div>
                         <div class="govuk-notification-banner__content">
                             <p class="govuk-notification-banner__heading">
-     You are previewing a draft standard
-    </p>
-                            <p>It is still be being edited prior to submission to the standard forum.<p>
-                                    <p>You cannot share this standard externally.</p>
-                                </div>
-                            </div>
+                  This standard is published.
+               </p>
+                            <p>Changes can be made by the standard owner or named contacts.</p>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if standard.stage.title === 'Approval' %}
+                    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                        <div class="govuk-notification-banner__header">
+                            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                  Important
+               </h2>
+                        </div>
+                        <div class="govuk-notification-banner__content">
+                            <p class="govuk-notification-banner__heading">
+                  This standard is ready to be reviewed
+               </p>
+                            <p>
+                                <a href="#governance">Review governance and record outcome</a>.
+               </p>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if standard.stage.title === 'Rejected' %}
+                    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                        <div class="govuk-notification-banner__header">
+                            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                  Important
+               </h2>
+                        </div>
+                        <div class="govuk-notification-banner__content">
+                            <p class="govuk-notification-banner__heading">
+                  Standard has been rejected
+               </p>
+                            <p>See the <a href="#reviewhistory">review history</a> for the reasons for the rejection.</p>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if standard.stage.title === 'Approved' %}
+                    <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                        <div class="govuk-notification-banner__header">
+                            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                  Important
+               </h2>
+                        </div>
+                        <div class="govuk-notification-banner__content">
+                            <p class="govuk-notification-banner__heading">
+                  Standard has been approved
+               </p>
+                            <p>The standard can now be published by the standaed owner.</p>
+                        </div>
+                    </div>
+                {% endif %}
+                         {% if standard.stage.title === 'Draft' %}
+                    <div class="govuk-notification-banner govuk-notification-banner--warning" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                        <div class="govuk-notification-banner__header">
+                            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                  Important
+               </h2>
+                        </div>
+                        <div class="govuk-notification-banner__content">
+                            <p class="govuk-notification-banner__heading">
+                  This standard is being drafted.
+               </p>
+                            <p>It has not yet been submitted for approval and should not be shared publicly in draft state.</p>
+                        </div>
+                    </div>
+                {% endif %}
+                <h2 id="summary" class="govuk-heading-l">Summary</h2>
+                <p class="govuk-body">{% markdown %}{{standard.summary | safe }}{% endmarkdown %}</p>
+                {% if standard.legalStandard == true %}
+                    <div class="govuk-warning-text">
+                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong class="govuk-warning-text__text">
+                            <span class="govuk-visually-hidden">Warning</span>You are breaking the law if you do not meet this standard.
+            </strong>
+                    </div>
+                {% endif %}
+                <h2 id="categories" class="govuk-heading-l">Categories</h2>
+                <p>The categories applicable to this standard are:</p>
 
-                        {% endif %}
+                <dl class="govuk-summary-list">
+                    {% for category in standard.categories %}
+                        <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+                            <dt class="govuk-summary-list__key">
+                                {{ category.title }}
+                            </dt>
+                            <dd class="govuk-summary-list__value">
+                                <ul class="govuk-list">
+                                    {% for subCategory in standard.sub_categories %}
+                                        {% if subCategory.category.id == category.id %}
+                                            <li>{{ subCategory.title }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            </dd>
+                        </div>
+                    {% endfor %}
+                </dl>
 
-                        <h2 id="summary" class="govuk-heading-l">Summary</h2>
-                        <p class="govuk-body">{% markdown %}{{standard.summary | safe }}{% endmarkdown %}</p>
-
-                        {% if standard.legalStandard == true %}
-
-                            <div class="govuk-warning-text">
-                                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                <strong class="govuk-warning-text__text">
-                                    <span class="govuk-visually-hidden">Warning</span>You are breaking the law if you do not meet this standard.
-  </strong>
-                            </div>
-
-                        {% endif %}
-
-                        <h2 id="categories" class="govuk-heading-l">Categories</h2>
-                        <p>The categories applicable to this standard are:</p>
-
-                        <dl class="govuk-summary-list">
-                            {% for category in standard.categories %}
-                                <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
-                                    <dt class="govuk-summary-list__key">
-                                        {{ category.title }}
-                                    </dt>
-                                    <dd class="govuk-summary-list__value">
-                                        <ul class="govuk-list">
-                                            {% for subCategory in standard.sub_categories %}
-                                                {% if subCategory.category.id == category.id %}
-                                                    <li>{{ subCategory.title }}</li>
-                                                {% endif %}
-                                            {% endfor %}
-                                        </ul>
-                                    </dd>
-                                </div>
-                            {% endfor %}
-                        </dl>
-
-                        <h2 id="purpose" class="govuk-heading-l">Purpose</h2>
-
-                        {% markdown %}{{ standard.purpose | safe }}{% endmarkdown %}
-
-                        <h2 id="howtommeet" class="govuk-heading-l">How to meet this standard</h2>
-
-                        {% markdown %}{{standard.howToMeet | safe }}{% endmarkdown %}
-
-                        {% if standard.phases | length %}
-                            <h2 id="whentommeet" class="govuk-heading-l">When to meet this standard</h2>
-                            <p class="govuk-body">You are required to meet this standard at the following phases of delivery.</p>
-
-                            <ul class="govuk-list govuk-list--bullet">
-
-                                {% for phase in standard.phases %}
-                                    <li>{{ phase.Title }}</li>
-                                {% endfor %}
-                            </ul>
-
-                        {% endif %}
-
-                        {% if standard.approvedProducts | length%}
-
-                            <h2 id="approvedproducts" class="govuk-heading-l">Approved products</h2>
-                              {% for product in standard.approvedProducts %}
+                <h2 id="purpose" class="govuk-heading-l">Purpose</h2>
+                <p class="govuk-body">{% markdown %}{{standard.purpose | safe }}{% endmarkdown %}</p>
+                <h2 id="howtommeet" class="govuk-heading-l">How to meet this standard</h2>
+                <p class="govuk-body">{% markdown %}{{standard.howToMeet | safe }}{% endmarkdown %}</p>
+                {% if standard.phases | length %}
+                    <h2 id="whentommeet" class="govuk-heading-l">When to meet this standard</h2>
+                    <p class="govuk-body">You are required to meet this standard at the following phases of delivery.</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        {% for phase in standard.phases %}
+                            <li>{{ phase.Title }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if standard.approvedProducts | length%}
+                    <h2 id="approvedproducts" class="govuk-heading-l">Approved products</h2>
+                     {% for product in standard.approvedProducts %}
 
                         <div class="govuk-summary-card">
                             <div class="govuk-summary-card__title-wrapper">
                                 <h2 class="govuk-summary-card__title">
-                                    {{ product.title}}
+                                    Approved product or service
                                 </h2>
                             </div>
                             <div class="govuk-summary-card__content">
                                 <div class="govuk-summary-list">
+                                     <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+                                        <dt class="govuk-summary-list__key">
+                                Product or service name
+                            </dt>
+                                        <dd class="govuk-summary-list__value">
+                                                  {{ product.title}}
+                                        </dd>
+                                    </div>
 
                                     <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
                                         <dt class="govuk-summary-list__key">
@@ -226,24 +272,27 @@
                         </div>
 
                     {% endfor %}
-                            
-
-                        {% endif %}
-
-                        {% if standard.toleratedProducts | length%}
-
-                            <h2 id="toleratedproducts" class="govuk-heading-l">Tolerated products</h2>
-                            {% for product in standard.toleratedProducts %}
+                {% endif %}
+                {% if standard.toleratedProducts | length%}
+                    <h2 id="toleratedproducts" class="govuk-heading-l">Tolerated products</h2>
+                     {% for product in standard.toleratedProducts %}
 
                         <div class="govuk-summary-card">
                             <div class="govuk-summary-card__title-wrapper">
                                 <h2 class="govuk-summary-card__title">
-                                    {{ product.title}}
+                                    Tolerated product or service
                                 </h2>
                             </div>
                             <div class="govuk-summary-card__content">
                                 <div class="govuk-summary-list">
-
+ <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+                                        <dt class="govuk-summary-list__key">
+                                Product or service name
+                            </dt>
+                                        <dd class="govuk-summary-list__value">
+                                                  {{ product.title}}
+                                        </dd>
+                                    </div>
                                     <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
                                         <dt class="govuk-summary-list__key">
                                 Vendor
@@ -283,73 +332,155 @@
                         </div>
 
                     {% endfor %}
-                        {% endif %}
-
-                        {% if standard.exceptions | length%}
-
-                            <h2 id="exceptions" class="govuk-heading-l">Exceptions</h2>
-                            <p class="govuk-body">{{standard.exceptions}}</p>
-                        {% endif %}
-
-                        <h2 id="owners" class="govuk-heading-l">Owner and contacts</h2>
-
-                        <dl class="govuk-summary-list">
-                            {% for person in standard.owners %}
-                                <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
-                                    <dt class="govuk-summary-list__key">
+                {% endif %}
+                {% if standard.exceptions | length%}
+                    <h2 id="exceptions" class="govuk-heading-l">Exceptions</h2>
+                    <p class="govuk-body">{{standard.exceptions}}</p>
+                {% endif %}
+                <h2 id="owners" class="govuk-heading-l">Owner and contacts</h2>
+                <dl class="govuk-summary-list">
+                    {% for person in standard.owners %}
+                        <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+                            <dt class="govuk-summary-list__key">
                                Standard owner
                             </dt>
-                                    <dd class="govuk-summary-list__value">
-                                        <a href="mailto:{{person.email}}">{{person.firstName}}
-                                            {{person.lastName}}</a>
-                                    </dd>
-                                </div>
-                            {% endfor %}
-                            {% for person in standard.contacts %}
-                                <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
-                                    <dt class="govuk-summary-list__key">
+                            <dd class="govuk-summary-list__value">
+                                <a href="mailto:{{person.email}}">{{person.firstName}}
+                                    {{person.lastName}}</a><br/>
+                                    {{person.JobRole}}
+                            </dd>
+                        </div>
+                    {% endfor %}
+                    {% for person in standard.contacts %}
+                        <div class="govuk-summary-list__row govuk-summary-list__row--no-actions">
+                            <dt class="govuk-summary-list__key">
                                Other point of contact
                             </dt>
-                                    <dd class="govuk-summary-list__value">
-                                        <a href="mailto:{{person.email}}">{{person.firstName}}
-                                            {{person.lastName}}</a>
-                                    </dd>
+                            <dd class="govuk-summary-list__value">
+                                <a href="mailto:{{person.email}}">{{person.firstName}}
+                                    {{person.lastName}}</a><br/>
+                                    {{person.JobRole}}
+                            </dd>
+                        </div>
+                    {% endfor %}
+                </dl>
+                <h2 id="governance" class="govuk-heading-l">Governance and validity</h2>
+                <p class="govuk-body">{% markdown %}{{standard.governance | safe }}{% endmarkdown %}</p>
+                <h3 id="validity" class="govuk-heading-m">
+         Validity</h2>
+                {% if standard.validityPeriod === 0 %}
+                    <p class="govuk-body">Conformance with the standard is a one time action.</p>
+                {% else %}
+                    <p class="govuk-body">Conformance with the standard must be confirmed every {{ standard.validityPeriod }} month{% if standard.validityPeriod !== 1 %}s{% endif %}.</p>
+                {% endif %}
+                <h2 id="reviewhistory" class="govuk-heading-l">Review history</h2>
+                {% if sortedStandardComments.length %}
+                    {% for comment in sortedStandardComments %}
+                        <div class="govuk-summary-card">
+                            <div class="govuk-summary-card__title-wrapper">
+                                <h3 class="govuk-summary-card__title">{{comment.title}}</h3>
+                            </div>
+                            <div class="govuk-summary-card__content">
+                                <dl class="govuk-summary-list">
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">Comments</dt>
+                                        <dd class="govuk-summary-list__value">{{comment.comments}}</dd>
+                                    </div>
+                                    <div class="govuk-summary-list__row">
+                                        <dt class="govuk-summary-list__key">Date</dt>
+                                        <dd class="govuk-summary-list__value">
+                                            {{comment.dateCreated | date('D MMMM YYYY [at] H:mm')}}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="govuk-body">There have been no previous reviews for this standard.</p>
+                {% endif %}
+
+                <h2 id="outcome" class="govuk-heading-l govuk-!-margin-top-5">Outcome</h2>
+                {% if standard.stage.title === 'Published' %}
+                
+
+                    <p class="govuk-body">This standard is published. There is no review needed.</p>
+                {% elseif standard.stage.title === 'Draft' %}
+                  <p class="govuk-body">This standard is being drafted. You cannot approve this yet.</p>
+                {% else %}
+    <p>When reviewing, you must ensure the standard:</p>
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>is complete</li>
+                        <li>can be applied in a binary way</li>
+                        <li>is clear and unambiguous</li>
+                        <li>is written using plain language and any acronyms, initialisms, and abbreviations are written out in full</li>
+                        <li>contains no commercially sensitive or secret information, which could damage department reputation or put the department at risk</li>
+                        <li>is not a duplicate of another standard</li>
+                    </ul>
+                    <div class="govuk-summary-card  govuk-!-margin-top-9">
+                        <div class="govuk-summary-card__title-wrapper">
+                            <h2 class="govuk-summary-card__title">Standard forum outcome</h2>
+                        </div>
+                        <div class="govuk-summary-card__content govuk-!-padding-top-5">
+                            <form method="post" action="/admin/standard/outcome" method="post">
+                                <input type="hidden" name="documentId" value="{{standard.documentId}}">
+                                <div class="govuk-form-group">
+                                    <fieldset class="govuk-fieldset" aria-describedby="outcome-hint">
+                                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">What is the standard forum outcome?</legend>
+                                        <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                                            <div class="govuk-radios__item">
+                                                <input class="govuk-radios__input" id="outcome" name="outcome" type="radio" value="Approved">
+                                                <label class="govuk-label govuk-radios__label" for="outcome">
+                              Approve
+                              </label>
+                                            </div>
+                                            <div class="govuk-radios__item">
+                                                <input class="govuk-radios__input" id="outcome-2" name="outcome" type="radio" value="Rejected">
+                                                <label class="govuk-label govuk-radios__label" for="outcome-2">
+                              Reject
+                              </label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
                                 </div>
-                            {% endfor %}
-                        </dl>
-
-                        {% if standard.relatedGuidance%}
-
-                            <h2 id="relatedGuidance" class="govuk-heading-l">Related guidance</h2>
-                            <p class="govuk-body">{% markdown %}{{standard.relatedGuidance | safe }}{% endmarkdown %}</p>
-                        {% endif %}
-
+                                <div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="1000">
+                                    <label class="govuk-label govuk-label--m" for="comments">
+                     Forum outcome comments
+                     </label>
+                                    <div id="comments-hint" class="govuk-hint">
+                        Optional comments which will go back to the standard owners and submittor.
+                     </div>
+                                    <textarea class="govuk-textarea govuk-js-character-count" id="comments" name="comments" rows="5" aria-describedby="comments-info comments-hint"></textarea>
+                                    <div id="comments-info" class="govuk-hint govuk-character-count__message">
+                        You can enter up to 1,000 characters
+                     </div>
+                                </div>
+                                <button type="submit" class="govuk-button" data-module="govuk-button">
+                  Submit outcome
+                  </button>
+                            </form>
+                        </div>
                     </div>
-
-                </div>
+                {% endif %}
             </div>
         </div>
+    </div>
 
-        <style>
 
-            @media (min-width: 768px) {
-                /* Apply sticky for larger screens */
-                .sticky {
-                    position: sticky;
-                    top: 20px;
-                    z-index: 10;
-                }
+    <style>
+        @media (min-width: 768px) {
+            /* Apply sticky for larger screens */
+            .sticky {
+                position: sticky;
+                top: 20px;
+                z-index: 10;
             }
-
-            @media (max-width: 767px) {
-                /* For smaller devices, default behavior */
-                .sticky {
-                    position: relative;
-                }
+        }
+        @media (max-width: 767px) {
+            /* For smaller devices, default behavior */
+            .sticky {
+                position: relative;
             }
-
-            blockquote > p:last-child {
-                margin-bottom: 0;
-            }
-        </style>
-    {% endblock %}
+        }
+    </style>
+{% endblock %}
