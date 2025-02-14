@@ -1,7 +1,7 @@
 {% extends "layouts/layout.html" %}
 
 {% set selectedNav = "Create" %}
-{% set pageName = "Remove exception" %}
+{% set pageName = "Remove exemption" %}
 {% set seoPageName = "" %}
 {% set pageDescription = ""%}
 
@@ -26,9 +26,9 @@
 
                     <input type="hidden" name="exceptionDocumentId" value="{{ exception.documentId }}">
 
-                    <h2 class="govuk-heading-l">Remove exception</h2>
+                    <h2 class="govuk-heading-l">Remove exemption</h2>
 
-                   <p class="govuk-body">Confirm you want to delete this exception.</p>
+                   <p class="govuk-body">Confirm you want to delete this exemption.</p>
 
 
                     <div class="govuk-summary-list">
@@ -46,9 +46,9 @@
         
                     <div class="govuk-button-group">
                         <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">
-                        Delete exception
+                        Delete exemption
                     </button>
-                     <a class="govuk-link" href="/create/exceptions">Cancel and return to exceptions</a>
+                     <a class="govuk-link" href="/create/exceptions">Cancel and return to exemptions</a>
                     </div>
 
                 </form>

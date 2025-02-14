@@ -1,7 +1,7 @@
 {% extends "layouts/layout.html" %}
 
 {% set selectedNav = "Create" %}
-{% set pageName = "Known exceptions" %}
+{% set pageName = "Known exemptions" %}
 {% set seoPageName = "" %}
 {% set pageDescription = ""%}
 
@@ -23,9 +23,9 @@
 
                       <form action="/create/people" method="get">
 
-                    <h2 class="govuk-heading-l">Known exceptions</h2>
+                    <h2 class="govuk-heading-l">Known exemptions</h2>
 
-                    <p>Known exceptions that apply to this standard.</p>
+                    <p>Known exemptions that apply to this standard.</p>
 
                     {% if standard.exceptions.length %}
 
@@ -49,7 +49,7 @@
                         </table>
 
                            <p class="govuk-body">
-                            <a href="/create/exceptions/add" class="govuk-link">Add another exception</a>.</p>
+                            <a href="/create/exceptions/add" class="govuk-link">Add another exemptions</a>.</p>
 
                         <div class="govuk-button-group">
                             <button type="submit" class="govuk-button" data-module="govuk-button">
@@ -59,14 +59,14 @@
                     {% else %}
 
                         <div class="govuk-inset-text">
-                            <p class="govuk-body">No exceptions have been added.</p>
+                            <p class="govuk-body">No exemptions have been added.</p>
                             <p class="govuk-body">
-                                <a href="/create/exceptions/add" class="govuk-link">Add an exception</a>.</p>
+                                <a href="/create/exceptions/add" class="govuk-link">Add an exemption</a>.</p>
                         </div>
 
                         <div class="govuk-button-group">
                             <button type="submit" class="govuk-button" data-module="govuk-button">
-                        Continue without adding exceptions
+                        Continue without adding exemptions
                     </button>
                         </div>
                     {% endif %}
