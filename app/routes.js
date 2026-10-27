@@ -79,6 +79,7 @@ router.get('/standard/:slug', isAuthenticated, standardsController.g_standardByS
 router.get('/standard/:slug/history', isAuthenticated, standardsController.g_standardHistoryBySlug);
 
 router.post('/standards/standard/publish', isAuthenticated, standardsController.p_publish_standard);
+router.post('/standards/standard/move-to-draft', isAuthenticated, standardsController.p_move_to_draft);
 router.post('/standards/standard/updatedpublish', isAuthenticated, standardsController.p_updatedpublish);
 
 //Editors
@@ -87,6 +88,8 @@ router.post('/standard/editor/purpose', isAuthenticated, standardsController.p_e
 
 // Create routes
 router.get('/create', isAuthenticated, createController.g_start);
+router.get('/create/propose', isAuthenticated, createController.g_propose);
+router.post('/create/propose', isAuthenticated, createController.p_propose);
 router.get('/create/getdraft/:documentId', isAuthenticated, createController.g_getdraft);
 router.get('/create/new', isAuthenticated, createController.g_new);
 router.get('/create/tasks', isAuthenticated, createController.g_tasks);
@@ -134,6 +137,7 @@ router.post('/create/standard/submit', isAuthenticated, createController.p_submi
 router.get('/admin', isAuthenticated, isAdmin, adminController.g_admin);
 router.get('/admin/review', isAuthenticated, isAdmin, adminController.g_review);
 router.get('/admin/standards', isAuthenticated, isAdmin, adminController.g_standards);
+router.get('/admin/standards/export', isAuthenticated, isAdmin, adminController.g_export_standards);
 router.get('/admin/draft-standards', isAuthenticated, isAdmin, adminController.g_draftstandards);
 router.get('/admin/admins', isAuthenticated, isAdmin, adminController.g_admins);
 router.get('/admin/admins/person/:id', isAuthenticated, isAdmin, adminController.g_person);

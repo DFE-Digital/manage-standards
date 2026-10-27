@@ -32,33 +32,69 @@
     <div class="govuk-width-container">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                <div class="dfe-grid-container">
+                <h2 class="govuk-heading-l govuk-!-margin-bottom-2">Standards by status</h2>
+                <p class="govuk-body">
+                    <a class="govuk-link" href="/admin/standards/export">Export all standards to Excel</a>
+                </p>
+                {% for status in statusGroups %}
+                    <h3 class="govuk-heading-m govuk-!-margin-bottom-2" id="status-{{ loop.index }}">{{ status.title }}</h3>
+                    {% if status.standards | length %}
+                        <table class="govuk-table admin-status-table" aria-labelledby="status-{{ loop.index }}">
+                            <colgroup>
+                                <col>
+                                <col>
+                                <col>
+                                <col>
+                                <col>
+                            </colgroup>
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th class="govuk-table__header" scope="col">Title</th>
+                                    <th class="govuk-table__header" scope="col">Reference</th>
+                                    <th class="govuk-table__header" scope="col">Version</th>
+                                    <th class="govuk-table__header" scope="col">Last updated</th>
+                                    <th class="govuk-table__header" scope="col">Submitted by</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                {% for standard in status.standards %}
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell">
+                                            <a href="/admin/standard/{{ standard.documentId }}" class="govuk-link">{{ standard.title or "New" }}</a>
+                                        </td>
+                                        <td class="govuk-table__cell">
+                                            {% if standard.standardId %}DDTS-{{ standard.standardId }}{% else %}Not set{% endif %}
+                                        </td>
+                                        <td class="govuk-table__cell">
+                                            {% if standard.version %}v.{{ standard.version | formatVersion }}{% endif %}
+                                        </td>
+                                        <td class="govuk-table__cell">{% if standard.updatedAt %}{{ standard.updatedAt | date('D MMM YYYY') }}{% endif %}</td>
+                                        <td class="govuk-table__cell">
+                                            {% if standard.creator %}{{ standard.creator.firstName }} {{ standard.creator.lastName }}{% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="govuk-body">No standards.</p>
+                    {% endif %}
+                {% endfor %}
+                <style>
+                    .admin-status-table {
+                        table-layout: fixed;
+                        width: 100%;
+                    }
 
-                    <div class="dfe-card">
-                        <div class="dfe-card-container">
-                            <h3 class="govuk-heading-m">
-                                <a href="/admin/review" class="govuk-link govuk-link--no-visited-state dfe-card-link--header govuk-!-font-size-80">{{ standards | length}}</a>
-                            </h3>
-                            <p>Standards requiring review</p>
-                        </div>
-                    </div>
-                    <div class="dfe-card">
-                        <div class="dfe-card-container">
-                            <h3 class="govuk-heading-m">
-                                <a href="/admin/standards" class="govuk-link govuk-link--no-visited-state dfe-card-link--header govuk-!-font-size-80">{{countStandards}}</a>
-                            </h3>
-                            <p>Published standards</p>
-                        </div>
-                    </div>
-                    <div class="dfe-card">
-                        <div class="dfe-card-container">
-                            <h3 class="govuk-heading-m">
-                                <a href="/admin/draft-standards" class="govuk-link govuk-link--no-visited-state dfe-card-link--header govuk-!-font-size-80">{{countDraftStandards}}</a>
-                            </h3>
-                            <p>Draft standards</p>
-                        </div>
-                    </div>
-                </div>
+                    .admin-status-table col {
+                        width: 20%;
+                    }
+
+                    .admin-status-table th,
+                    .admin-status-table td {
+                        overflow-wrap: anywhere;
+                    }
+                </style>
             </div>
         </div>
     </div>

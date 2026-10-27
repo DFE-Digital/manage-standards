@@ -418,31 +418,45 @@ const getStandardBySlug = async (slug) => {
 
 const getStandardByDocumentId = async (documentId) => {
 
-    try {
-        const response = await strapiClient.get(`/api/standards?status=draft`, {
-            params: {
-                'filters[documentId][$eq]': documentId,
+    const params = {
+        'filters[documentId][$eq]': documentId,
+        populate: {
+            categories: true,
+            owners: true,
+            contacts: true,
+            approvedProducts: true,
+            toleratedProducts: true,
+            exceptions: true,
+            standard_comments: true,
+            creator: true,
+            stage: true,
+            sub_categories: {
                 populate: {
-                    categories: true,
-                    owners: true,
-                    contacts: true,
-                    approvedProducts: true,
-                    toleratedProducts: true,
-                    exceptions: true,
-                    standard_comments: true,
-                    creator: true,
-                    stage: true,
-                    sub_categories: {
-                        populate: {
-                            category: true, // Deep population for sub_categories -> category
-                        },
-                    },
+                    category: true, // Deep population for sub_categories -> category
                 },
             },
-        });
+        },
+    };
 
-        // Return the standard data
-        return response.data.data[0]; // Assuming slug is unique and returning the first match
+    const readStandard = async (publicationStatus) => {
+        const url = publicationStatus ? `/api/standards?status=${publicationStatus}` : '/api/standards';
+        const response = await strapiClient.get(url, { params });
+
+        if (!response?.data || !Array.isArray(response.data.data)) {
+            throw new Error('Unexpected response format from Strapi API.');
+        }
+
+        return response.data.data[0] || null;
+    };
+
+    try {
+        const draft = await readStandard('draft');
+        if (draft?.stage?.title) {
+            return draft;
+        }
+
+        const published = await readStandard();
+        return published || draft;
     } catch (error) {
         // Log the error with additional context
         console.error(`Failed to fetch standard with id: ${documentId}`, error.message);
@@ -523,6 +537,36 @@ const getStandardsDraftByUser = async (userId) => {
 
         // Rethrow the error with a meaningful message
         throw new Error(`Error fetching standards: ${error.message}`);
+    }
+};
+
+const getProposedStandardsByUser = async (userId) => {
+    if (!userId || typeof userId !== 'number') {
+        throw new Error("Invalid user ID: A valid numeric user ID must be provided.");
+    }
+
+    try {
+        const user = await getUserById(userId);
+        let response;
+
+        if (user.Administrator === true) {
+            response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[stage][title][$eq]=Proposed`);
+        } else {
+            response = await strapiClient.get(`/api/standards?status=draft&populate=*&filters[$or][0][creator][$eq]=${userId}&filters[$or][1][owners][$in]=${userId}&filters[stage][title][$eq]=Proposed`);
+        }
+
+        if (!response || !response.data) {
+            throw new Error("Unexpected response format from Strapi API.");
+        }
+
+        if (!Array.isArray(response.data.data)) {
+            return [];
+        }
+
+        return response.data.data;
+    } catch (error) {
+        console.error(`Failed to fetch proposed standards for user ID: ${userId}`, error.message);
+        throw new Error(`Error fetching proposed standards: ${error.message}`);
     }
 };
 
@@ -610,6 +654,82 @@ const createStandardDraft = async (userId, title) => {
         console.error(`Failed to create standard draft for user ID: ${userId}`, error.message);
         throw new Error(`Error creating standard draft: ${error.message}`);
     }
+};
+
+const createProposedStandard = async (userId, title, summary) => {
+    if (!userId || typeof userId !== 'number') {
+        throw new Error("Invalid user ID: A valid numeric user ID must be provided.");
+    }
+
+    if (!title || typeof title !== 'string') {
+        throw new Error("Invalid title: A valid string title must be provided.");
+    }
+
+    if (!summary || typeof summary !== 'string') {
+        throw new Error("Invalid summary: A valid string summary must be provided.");
+    }
+
+    const stage = await getStageDocumentId('Proposed');
+    const slug = title
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9-]+/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+
+    try {
+        const createResponse = await strapiClient.post(`/api/standards?status=draft`, {
+            data: {
+                title,
+                summary,
+                stage,
+                creator: userId,
+                previousVersion: 0,
+                draftCreated: new Date(),
+                slug,
+                publishedAt: null,
+            },
+        });
+
+        if (!createResponse?.data?.data?.documentId) {
+            throw new Error('Unexpected response format from Strapi API during creation.');
+        }
+
+        const created = createResponse.data.data;
+        const updateResponse = await strapiClient.put(`/api/standards/${created.documentId}?status=draft`, {
+            data: {
+                standardId: created.id,
+            },
+        });
+
+        if (!updateResponse?.data?.data) {
+            throw new Error('Unexpected response format from Strapi API during creation.');
+        }
+
+        return updateResponse.data.data;
+    } catch (error) {
+        if (error.response) {
+            console.error('Strapi API Error:', error.response?.data?.error);
+        }
+
+        console.error(`Failed to create proposed standard for user ID: ${userId}`, error.message);
+        throw new Error(`Error creating proposed standard: ${error.message}`);
+    }
+};
+
+const setStandardStage = async (documentId, stageTitle) => {
+    const stage = await getStageDocumentId(stageTitle);
+    const response = await strapiClient.put(`/api/standards/${documentId}?status=draft`, {
+        data: {
+            stage,
+        },
+    });
+
+    if (!response?.data?.data) {
+        throw new Error('Unexpected response format from Strapi API.');
+    }
+
+    return response.data.data;
 };
 
 
@@ -1169,6 +1289,105 @@ const getCountStandards = async (includeDraft = false) => {
         throw new Error(`Error fetching standards: ${error.message}`);
     }
 }
+
+const fetchPagedCollection = async (url, params) => {
+    const pageSize = 100;
+    const records = [];
+    let page = 1;
+    let pageCount = 1;
+
+    do {
+        const response = await strapiClient.get(url, {
+            params: {
+                ...params,
+                'pagination[page]': page,
+                'pagination[pageSize]': pageSize,
+            },
+        });
+
+        if (!response?.data || !Array.isArray(response.data.data)) {
+            throw new Error('Unexpected response format from Strapi API.');
+        }
+
+        records.push(...response.data.data);
+        pageCount = response.data.meta?.pagination?.pageCount || 1;
+        page += 1;
+    } while (page <= pageCount);
+
+    return records;
+};
+
+// Same standards endpoint used by getStandards. Only the stage and creator
+// are populated, which is what the admin list displays.
+const fetchAllStandards = async (publicationStatus) => {
+    const url = publicationStatus ? '/api/standards?status=draft' : '/api/standards';
+
+    return fetchPagedCollection(url, {
+        populate: {
+            stage: true,
+            creator: true,
+        },
+        sort: 'title',
+    });
+};
+
+const getStages = async () => {
+    return fetchPagedCollection('/api/stages', {
+        sort: 'number:asc',
+    });
+};
+
+// Groups each standard once, by the stage stored in the CMS. A draft copy is
+// the working version, so it takes precedence over the published copy.
+const getStandardsGroupedByStatus = async () => {
+    try {
+        const [stages, publishedStandards, draftStandards] = await Promise.all([
+            getStages(),
+            fetchAllStandards(),
+            fetchAllStandards('draft'),
+        ]);
+
+        const standardsByDocumentId = new Map();
+
+        const rememberStandard = (standard) => {
+            if (!standard.documentId) {
+                return;
+            }
+
+            const existing = standardsByDocumentId.get(standard.documentId);
+            if (!existing || standard.stage?.title) {
+                standardsByDocumentId.set(standard.documentId, standard);
+            }
+        };
+
+        publishedStandards.forEach(rememberStandard);
+        draftStandards.forEach(rememberStandard);
+
+        const groups = stages
+            .filter((stage) => stage.title)
+            .map((stage) => ({
+                title: stage.title,
+                standards: [],
+            }));
+        const groupByTitle = Object.fromEntries(groups.map((group) => [group.title, group]));
+
+        standardsByDocumentId.forEach((standard) => {
+            const group = groupByTitle[standard.stage?.title];
+            if (group) {
+                group.standards.push(standard);
+            }
+        });
+
+        groups.forEach((group) => {
+            group.standards.sort((a, b) => (a.title || '').localeCompare(b.title || '', 'en', { sensitivity: 'base' }));
+        });
+
+        return groups;
+    } catch (error) {
+        console.error('Failed to group standards by status', error.message);
+        throw new Error(`Error grouping standards by status: ${error.message}`);
+    }
+};
 
 const getCategories = async () => {
 
@@ -2070,5 +2289,5 @@ const getCategoryTitles = async () => {
 };
 
 module.exports = {
-    getStageId, getUser, createUser, recycleToken, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, createStandardDraft, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog, updatedPublishStandard, getCategoryTitles, updateSummaryAndPublish, updatePurposeAndPublish
+    getStageId, getUser, createUser, recycleToken, getUserByToken, updateUser, getStandardsOwnedByUser, getStandardsOwnedByUserDocumentId, getStandardBySlug, getStandardsDraftByUser, getProposedStandardsByUser, createStandardDraft, createProposedStandard, setStandardStage, updateSummary, updatePurpose, updateMeet, updateTitle, getStandardDraft, getDraftsForApproval, getAdmins, addAdmin, getUserById, removeAdmin, getStandards, getCountStandards, getStandardsGroupedByStatus, getStandardByDocumentId, updateGovernance, updateLegality, getPreview, getCategories, updateCategories, getSubCategories, getProducts, updateProducts, removeApprovedProduct, removeToleratedProduct, updateValidity, updateException, removeException, getPeople, updatePeople, removeOwner, removeContact, submitStandard, updateSubCategories, submitOutcome, saveStandardComments, getStandardComments, publishStandard, createAuditLog, updatedPublishStandard, getCategoryTitles, updateSummaryAndPublish, updatePurposeAndPublish
 };

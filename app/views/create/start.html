@@ -25,14 +25,17 @@
                 <p>Use this service to create a new digital data and technology standard.<p>
                 <p>You should draft the standard first, using <a class="govuk-link" href="https://dfe-manage-standards-ab4ba065d125.herokuapp.com/downloads/2025_01_15_standard-template.docx">the standards template</a>.</p>
                 <p>This will help you when adding the standard to this service.</p>
-                <p>
+                <div class="govuk-button-group">
                     <a href="/create/new" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
   Start now
   <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
                             <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
                         </svg>
                     </a>
-                </p>
+                    <a href="/create/propose" role="button" draggable="false" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Propose a standard
+                    </a>
+                </div>
                 {% if drafts | length%}
                     <div class="govuk-summary-card">
                         <div class="govuk-summary-card__title-wrapper">
@@ -64,6 +67,39 @@
                                             </th>
                                             <td class="govuk-table__cell">DDTS-{{draft.standardId }}</td>
                                             <td class="govuk-table__cell">{{draft.createdAt | date('DD MMM YYYY')}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if proposed | length %}
+                    <div class="govuk-summary-card">
+                        <div class="govuk-summary-card__title-wrapper">
+                            <h2 class="govuk-summary-card__title">
+      Your proposed standards
+    </h2>
+                        </div>
+                        <div class="govuk-summary-card__content">
+                            <table class="govuk-table">
+                                <thead class="govuk-table__head">
+                                    <tr class="govuk-table__row">
+                                        <th scope="col" class="govuk-table__header govuk-!-width-one-half">Title</th>
+                                        <th scope="col" class="govuk-table__header">Reference</th>
+                                        <th scope="col" class="govuk-table__header">Started</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="govuk-table__body">
+                                    {% for standard in proposed %}
+                                        <tr class="govuk-table__row">
+                                            <th scope="row" class="govuk-table__header">
+                                                <a href="/standards/standard/manage/{{ standard.documentId }}" class="govuk-link">
+                                                    {{ standard.title or "New" }}
+                                                </a>
+                                            </th>
+                                            <td class="govuk-table__cell">{% if standard.standardId %}DDTS-{{ standard.standardId }}{% else %}Not set{% endif %}</td>
+                                            <td class="govuk-table__cell">{{ standard.createdAt | date('DD MMM YYYY') }}</td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>

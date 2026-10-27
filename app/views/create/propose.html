@@ -1,0 +1,85 @@
+{% extends "layouts/layout.html" %}
+
+{% set selectedNav = "Create" %}
+{% set pageName = "Propose a standard" %}
+{% set seoPageName = "" %}
+{% set pageDescription = ""%}
+{% set view = "standard" %}
+
+{% block hero %}
+    <div class="dfe-page-header">
+        <div class="govuk-width-container dfe-width-container ">
+            <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                    <h1 class="govuk-heading-xl govuk-!-padding-top-5">{{ pageName }}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="govuk-width-container ">
+        <a href="/create" class="govuk-back-link">Back</a>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                {% include './errorSummary.html' %}
+
+                <p class="govuk-body">A proposal only needs a title and summary. You can move it to draft later to add the rest of the standard.</p>
+
+                <form action="/create/propose" method="post">
+                    <div class="govuk-form-group {% if errors %}{% for err in errors %}{% if err.path == 'title' %}govuk-form-group--error{% endif %}{% endfor %}{% endif %}">
+                        <h2 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--l" for="title">
+                                Title of standard
+                            </label>
+                        </h2>
+                        <div id="title-hint" class="govuk-hint">
+                            This will help people understand what the standard is for.
+                        </div>
+                        {% if errors %}
+                            {% for err in errors %}
+                                {% if err.path == 'title' %}
+                                    <p id="title-error" class="govuk-error-message">
+                                        <span class="govuk-visually-hidden">Error:</span> {{ err.msg }}
+                                    </p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        <input class="govuk-input {% if errors %}{% for err in errors %}{% if err.path == 'title' %}govuk-input--error{% endif %}{% endfor %}{% endif %}" id="title" name="title" type="text" aria-describedby="title-hint" value="{{ title }}">
+                    </div>
+
+                    <div class="govuk-form-group govuk-character-count {% if errors %}{% for err in errors %}{% if err.path == 'summary' %}govuk-form-group--error{% endif %}{% endfor %}{% endif %}" data-module="govuk-character-count" data-maxlength="300">
+                        <h2 class="govuk-label-wrapper">
+                            <label class="govuk-label govuk-label--l" for="summary">
+                                Summary
+                            </label>
+                        </h2>
+                        <div id="summary-hint" class="govuk-hint">
+                            A short description of the standard. Used in search results and to help people understand the standard at a high level.
+                        </div>
+                        {% if errors %}
+                            {% for err in errors %}
+                                {% if err.path == 'summary' %}
+                                    <p id="summary-error" class="govuk-error-message">
+                                        <span class="govuk-visually-hidden">Error:</span> {{ err.msg }}
+                                    </p>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        <textarea class="govuk-textarea govuk-js-character-count {% if errors %}{% for err in errors %}{% if err.path == 'summary' %}govuk-textarea--error{% endif %}{% endfor %}{% endif %}" id="summary" name="summary" rows="5" aria-describedby="summary-hint summary-info">{{ summary }}</textarea>
+                        <div id="summary-info" class="govuk-hint govuk-character-count__message">
+                            You can enter up to 300 characters
+                        </div>
+                    </div>
+
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            Propose standard
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

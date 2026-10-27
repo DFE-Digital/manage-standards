@@ -111,6 +111,43 @@ exports.g_standard_manage = async (req, res, next) => {
     }
 }
 
+exports.p_move_to_draft = async (req, res) => {
+    try {
+        const { documentId } = req.body;
+        const standard = await strapiService.getStandardByDocumentId(documentId);
+
+        if (!standard || standard.stage?.title !== 'Proposed') {
+            return res.status(400).render('error', {
+                title: 'Error',
+                message: 'Only a proposed standard can be moved to draft.'
+            });
+        }
+
+        await strapiService.setStandardStage(documentId, 'Draft');
+
+        await strapiService.createAuditLog({
+            data: {
+                title: 'Standard moved to draft',
+                entity: 'Standard',
+                entityId: documentId,
+                user: req.session.User.documentId,
+                auditDate: new Date(),
+                details: 'standards.p_move_to_draft',
+                oldValue: 'Proposed',
+                newValue: 'Draft',
+            },
+        });
+
+        return res.redirect(`/create/getdraft/${documentId}`);
+    } catch (error) {
+        console.error('Error moving standard to draft:', error);
+        res.status(500).render('error', {
+            title: 'Error',
+            message: 'Failed to move standard to draft. Please try again later.'
+        });
+    }
+}
+
 exports.g_standard_history = async (req, res, next) => {
 
     try {

@@ -1,24 +1,104 @@
+const ExcelJS = require('exceljs');
+const dateFilter = require('nunjucks-date-filter');
 const strapiService = require('../../services/strapiService');
 const { validationResult } = require('express-validator');
 const { validateAddAdmin } = require('../validation/authValidation');
 const validation = require('../validation/createValidation');
 const notifyService = require('../../services/notifyService.js');
 
+const formatVersion = (version) => {
+    if (!version) {
+        return '';
+    }
+    const number = Number(version);
+    if (!Number.isFinite(number)) {
+        return '';
+    }
+    return `v.${number.toFixed(2)}`;
+};
+
+const formatReference = (standardId) => (standardId ? `DDTS-${standardId}` : 'Not set');
+
+const formatSubmittedBy = (creator) => {
+    if (!creator) {
+        return '';
+    }
+    return [creator.firstName, creator.lastName].filter(Boolean).join(' ');
+};
+
+const formatUpdatedAt = (value) => {
+    if (!value) {
+        return '';
+    }
+    const formatted = dateFilter(value, 'D MMM YYYY');
+    return formatted === 'Invalid Date' ? '' : formatted;
+};
+
+const buildStandardsWorkbook = (statusGroups) => {
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Manage standards';
+
+    const sheet = workbook.addWorksheet('Standards');
+    sheet.columns = [
+        { header: 'Status', key: 'status', width: 22 },
+        { header: 'Title', key: 'title', width: 48 },
+        { header: 'Reference', key: 'reference', width: 16 },
+        { header: 'Version', key: 'version', width: 12 },
+        { header: 'Last updated', key: 'updatedAt', width: 18 },
+        { header: 'Submitted by', key: 'submittedBy', width: 28 },
+    ];
+    sheet.getRow(1).font = { bold: true };
+    sheet.autoFilter = 'A1:F1';
+    sheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+    statusGroups.forEach((group) => {
+        group.standards.forEach((standard) => {
+            sheet.addRow({
+                status: group.title,
+                title: standard.title || 'New',
+                reference: formatReference(standard.standardId),
+                version: formatVersion(standard.version),
+                updatedAt: formatUpdatedAt(standard.updatedAt),
+                submittedBy: formatSubmittedBy(standard.creator),
+            });
+        });
+    });
+
+    return workbook;
+};
+
+exports.buildStandardsWorkbook = buildStandardsWorkbook;
+
 exports.g_admin = async (req, res, next) => {
 
     try {
-        const user = req.session.User;
+        const statusGroups = await strapiService.getStandardsGroupedByStatus();
 
-        const standards = await strapiService.getDraftsForApproval();
-        const countStandards = await strapiService.getCountStandards();
-        const countDraftStandards = await strapiService.getCountStandards(true);
-
-        return res.render('admin/index', { standards, countStandards, countDraftStandards });
+        return res.render('admin/index', { statusGroups });
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         res.status(500).render('error', {
             title: 'Error',
             message: 'Failed to load dashboard. Please try again later.'
+        });
+    }
+}
+
+exports.g_export_standards = async (req, res) => {
+    try {
+        const statusGroups = await strapiService.getStandardsGroupedByStatus();
+        const workbook = buildStandardsWorkbook(statusGroups);
+        const exportedOn = new Date().toISOString().slice(0, 10);
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="standards-${exportedOn}.xlsx"`);
+        return res.send(Buffer.from(buffer));
+    } catch (error) {
+        console.error('Error exporting standards:', error);
+        return res.status(500).render('error', {
+            title: 'Error',
+            message: 'Failed to export standards. Please try again later.'
         });
     }
 }
@@ -82,13 +162,15 @@ exports.g_standard = async (req, res, next) => {
         // Fetch the standard by documentId
         const standard = await strapiService.getStandardByDocumentId(req.params.documentId);
 
-        // Extract and sort the standard_comments 
-        // if stadard_comments is not available, set it to an empty array
+        if (!standard) {
+            return res.status(404).render('error', {
+                title: 'Standard not found',
+                message: 'That standard could not be found.'
+            });
+        }
 
+        const standardComments = Array.isArray(standard.standard_comments) ? standard.standard_comments : [];
 
-
-        const standardComments = standard.standard_comments ?? [];
-        
         const sortedStandardComments = standardComments.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated));
 
         // Pass the standard and sorted comments to the view

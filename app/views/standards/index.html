@@ -34,6 +34,8 @@
                                             <a href="/standards/standard/manage/{{ standard.documentId}}" class="govuk-link">{{ standard.title }}</a>
                                         {% elseif standard.stage.title === 'Approved' %}
                                             <a href="/standards/standard/manage/{{ standard.documentId}}" class="govuk-link">{{ standard.title }}</a>
+                                        {% elseif standard.stage.title === 'Proposed' %}
+                                            <a href="/standards/standard/manage/{{ standard.documentId}}" class="govuk-link">{{ standard.title }}</a>
                                         {% else %}
                                             <a href="/standards/standard/{{ standard.documentId}}" class="govuk-link">{{ standard.title }}</a>
                                         {% endif %}

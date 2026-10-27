@@ -21,7 +21,8 @@ exports.g_start = async (req, res, next) => {
         req.session.Standard = null;
 
         const drafts = await strapiService.getStandardsDraftByUser(user.id);
-        res.render('create/start', { drafts });
+        const proposed = await strapiService.getProposedStandardsByUser(user.id);
+        res.render('create/start', { drafts, proposed });
     } catch (error) {
         console.error('Error fetching data:', error);
         renderErrorPage(res);
@@ -46,6 +47,50 @@ exports.g_getdraft = async (req, res, next) => {
         renderErrorPage(res);
     }
 };
+
+exports.g_propose = async (req, res) => {
+    return res.render('create/propose');
+};
+
+exports.p_propose = [
+    ...validation.validateTitle,
+    ...validation.validateSummary,
+    async (req, res) => {
+        const errors = validationResult(req);
+        const { title, summary } = req.body;
+
+        if (!errors.isEmpty()) {
+            return res.render('create/propose', {
+                errors: errors.array(),
+                title,
+                summary,
+            });
+        }
+
+        try {
+            const user = req.session.User;
+            const standard = await strapiService.createProposedStandard(user.id, title, summary);
+
+            await strapiService.createAuditLog({
+                data: {
+                    title: 'Standard proposed',
+                    entity: 'Standard',
+                    entityId: standard.documentId,
+                    user: user.documentId,
+                    auditDate: new Date(),
+                    details: 'create.p_propose',
+                    oldValue: '',
+                    newValue: 'Proposed',
+                },
+            });
+
+            return res.redirect(`/standards/standard/manage/${standard.documentId}`);
+        } catch (error) {
+            console.error('Error proposing standard:', error);
+            return renderErrorPage(res, 'Failed to propose standard. Please try again later.');
+        }
+    },
+];
 
 exports.g_new = async (req, res, next) => {
     try {

@@ -24,6 +24,26 @@
         <div class="govuk-grid-column-one-quarter"></div>
         <div class="govuk-grid-column-three-quarters">
 
+            {% if standard.stage.title === 'Proposed' %}
+
+                <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Important</h2>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">This standard is proposed.</p>
+                        <p class="govuk-body">Move it to draft when you are ready to add the rest of the standard and continue editing.</p>
+                        <form method="post" action="/standards/standard/move-to-draft">
+                            <input type="hidden" name="documentId" value="{{ standard.documentId }}">
+                            <div class="govuk-button-group">
+                                <button type="submit" class="govuk-button">Move to draft</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            {% endif %}
+
             {% if standard.stage.title === 'Approval' %}
 
                 <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
