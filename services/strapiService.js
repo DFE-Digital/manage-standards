@@ -1367,6 +1367,7 @@ const getStandardsGroupedByStatus = async () => {
             .filter((stage) => stage.title)
             .map((stage) => ({
                 title: stage.title,
+                slug: stage.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
                 standards: [],
             }));
         const groupByTitle = Object.fromEntries(groups.map((group) => [group.title, group]));

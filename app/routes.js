@@ -135,6 +135,7 @@ router.post('/create/standard/submit', isAuthenticated, createController.p_submi
 
 // Admin routes
 router.get('/admin', isAuthenticated, isAdmin, adminController.g_admin);
+router.get('/admin/status/:status', isAuthenticated, isAdmin, adminController.g_admin_status);
 router.get('/admin/review', isAuthenticated, isAdmin, adminController.g_review);
 router.get('/admin/standards', isAuthenticated, isAdmin, adminController.g_standards);
 router.get('/admin/standards/export', isAuthenticated, isAdmin, adminController.g_export_standards);
