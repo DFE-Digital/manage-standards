@@ -1,4 +1,14 @@
 // app.js
+// Winston's exception handler writes to a file and does not print to stdout.
+// On Heroku that file is not in the log stream, so a startup exception exits
+// with status 0 and the reason never appears. Print it here as well.
+process.on('uncaughtException', (error) => {
+    console.error(error);
+});
+process.on('unhandledRejection', (error) => {
+    console.error(error);
+});
+
 const express = require('express');
 const nunjucks = require('nunjucks');
 const path = require('path');
@@ -81,7 +91,7 @@ var nunjuckEnv = nunjucks.configure([
 ], {
     autoescape: true,
     express: app,
-    watch: true,
+    watch: process.env.NODE_ENV !== 'production',
     extension: 'html',
     noCache: false
 });

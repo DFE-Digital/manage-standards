@@ -23,9 +23,11 @@ const logger = createLogger({
         new transports.File({ filename: 'errors.log', level: 'error' }), // Only errors
     ],
     exceptionHandlers: [
+        new transports.Console(),
         new transports.File({ filename: 'exceptions.log' })
     ],
     rejectionHandlers: [
+        new transports.Console(),
         new transports.File({ filename: 'rejections.log' })
     ],
     exitOnError: false,

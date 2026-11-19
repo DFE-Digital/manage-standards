@@ -1,4 +1,3 @@
-const ExcelJS = require('exceljs');
 const dateFilter = require('nunjucks-date-filter');
 const strapiService = require('../../services/strapiService');
 const { validationResult } = require('express-validator');
@@ -35,6 +34,7 @@ const formatUpdatedAt = (value) => {
 };
 
 const buildStandardsWorkbook = (statusGroups) => {
+    const ExcelJS = require('exceljs');
     const workbook = new ExcelJS.Workbook();
     workbook.creator = 'Manage standards';
 
