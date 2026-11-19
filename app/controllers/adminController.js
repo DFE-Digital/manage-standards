@@ -84,6 +84,28 @@ exports.g_admin = async (req, res, next) => {
     }
 }
 
+exports.g_admin_status = async (req, res) => {
+    try {
+        const statusGroups = await strapiService.getStandardsGroupedByStatus();
+        const status = statusGroups.find((group) => group.slug === req.params.status);
+
+        if (!status) {
+            return res.status(404).render('error', {
+                title: 'Status not found',
+                message: 'That status could not be found.'
+            });
+        }
+
+        return res.render('admin/status', { status });
+    } catch (error) {
+        console.error('Error fetching standards for status:', error);
+        return res.status(500).render('error', {
+            title: 'Error',
+            message: 'Failed to load standards. Please try again later.'
+        });
+    }
+}
+
 exports.g_export_standards = async (req, res) => {
     try {
         const statusGroups = await strapiService.getStandardsGroupedByStatus();

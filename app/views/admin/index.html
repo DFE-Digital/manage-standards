@@ -36,63 +36,32 @@
                 <p class="govuk-body">
                     <a class="govuk-link" href="/admin/standards/export">Export all standards to Excel</a>
                 </p>
-                {% for status in statusGroups %}
-                    <h3 class="govuk-heading-m govuk-!-margin-bottom-2" id="status-{{ loop.index }}">{{ status.title }}</h3>
-                    {% if status.standards | length %}
-                        <table class="govuk-table admin-status-table" aria-labelledby="status-{{ loop.index }}">
-                            <colgroup>
-                                <col>
-                                <col>
-                                <col>
-                                <col>
-                                <col>
-                            </colgroup>
-                            <thead class="govuk-table__head">
-                                <tr class="govuk-table__row">
-                                    <th class="govuk-table__header" scope="col">Title</th>
-                                    <th class="govuk-table__header" scope="col">Reference</th>
-                                    <th class="govuk-table__header" scope="col">Version</th>
-                                    <th class="govuk-table__header" scope="col">Last updated</th>
-                                    <th class="govuk-table__header" scope="col">Submitted by</th>
-                                </tr>
-                            </thead>
-                            <tbody class="govuk-table__body">
-                                {% for standard in status.standards %}
-                                    <tr class="govuk-table__row">
-                                        <td class="govuk-table__cell">
-                                            <a href="/admin/standard/{{ standard.documentId }}" class="govuk-link">{{ standard.title or "New" }}</a>
-                                        </td>
-                                        <td class="govuk-table__cell">
-                                            {% if standard.standardId %}DDTS-{{ standard.standardId }}{% else %}Not set{% endif %}
-                                        </td>
-                                        <td class="govuk-table__cell">
-                                            {% if standard.version %}v.{{ standard.version | formatVersion }}{% endif %}
-                                        </td>
-                                        <td class="govuk-table__cell">{% if standard.updatedAt %}{{ standard.updatedAt | date('D MMM YYYY') }}{% endif %}</td>
-                                        <td class="govuk-table__cell">
-                                            {% if standard.creator %}{{ standard.creator.firstName }} {{ standard.creator.lastName }}{% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="govuk-body">No standards.</p>
-                    {% endif %}
-                {% endfor %}
+                <div class="dfe-grid-container admin-status-cards">
+                    {% for status in statusGroups %}
+                        <div class="dfe-card">
+                            <div class="dfe-card-container">
+                                <h3 class="govuk-heading-m">
+                                    <a href="/admin/status/{{ status.slug }}" class="govuk-link govuk-link--no-visited-state dfe-card-link--header govuk-!-font-size-48">{{ status.standards | length }}</a>
+                                </h3>
+                                <p>{{ status.title }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
                 <style>
-                    .admin-status-table {
-                        table-layout: fixed;
-                        width: 100%;
+                    @media (min-width: 40.0625em) {
+                        .admin-status-cards {
+                            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                            gap: 15px;
+                        }
                     }
 
-                    .admin-status-table col {
-                        width: 20%;
+                    .admin-status-cards .dfe-card {
+                        max-width: none;
                     }
 
-                    .admin-status-table th,
-                    .admin-status-table td {
-                        overflow-wrap: anywhere;
+                    .admin-status-cards .dfe-card-container {
+                        padding: 15px;
                     }
                 </style>
             </div>
