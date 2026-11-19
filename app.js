@@ -1,4 +1,12 @@
 // app.js
+// Node 25 removed buffer.SlowBuffer. notifications-node-client loads
+// jsonwebtoken -> jwa -> buffer-equal-constant-time, which reads
+// SlowBuffer.prototype while the module is loading.
+const nodeBuffer = require('buffer');
+if (typeof nodeBuffer.SlowBuffer === 'undefined') {
+    nodeBuffer.SlowBuffer = nodeBuffer.Buffer;
+}
+
 // Winston's exception handler writes to a file and does not print to stdout.
 // On Heroku that file is not in the log stream, so a startup exception exits
 // with status 0 and the reason never appears. Print it here as well.
